@@ -2,9 +2,11 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 
 public class Character {
     final DashToMouse dashToMouse;
+    CircleAttack circleAttack = new CircleAttack(this);
     float moveSpeed = 500;
     Sprite sprite;
 
@@ -16,6 +18,12 @@ public class Character {
 
     public void update() {
         dashToMouse.update();
+        circleAttack.update();
+    }
+
+    public void circleAttack(Blupy blupy){
+        circleAttack.overlapsThis(blupy);
+
     }
 
     public void moveRight(float delta) {
@@ -36,5 +44,13 @@ public class Character {
     public void moveDown(float delta) {
         if(!dashToMouse.jumpTimer.isFlagged())
             sprite.translateY(-moveSpeed * delta);
+    }
+
+    public float centerX(){
+        return sprite.getX() + sprite.getWidth()/2f;
+    }
+
+    public float centerY(){
+        return sprite.getY() + sprite.getHeight()/2f;
     }
 }

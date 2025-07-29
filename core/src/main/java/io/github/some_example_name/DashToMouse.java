@@ -30,7 +30,6 @@ public class DashToMouse {
             float mouseX = Gdx.input.getX() - project.x;
             float mouseY = 1080 - project.y - Gdx.input.getY();
 
-            System.out.println(Gdx.input.getX() +" "+ project.x + " " + Gdx.input.getY() +" "+ project.y);
             direction = new Vector2(mouseX, mouseY);
             direction.nor();
             float scalar = Math.min(jumpDistance, new Vector2(mouseX, mouseY).len()/8);

@@ -6,8 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +95,11 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.A)) ch.moveLeft(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.D)) ch.moveRight(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.G)) enemies.add(new Blupy());
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+            for (Blupy enemy : enemies) {
+                ch.circleAttack(enemy);
+            }
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.PLUS)) camera.zoom *= 0.99f;
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom *= 1.01f;
