@@ -19,18 +19,22 @@ public class Character {
     }
 
     public void moveRight(float delta) {
-        sprite.translateX(moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged())
+            sprite.translateX(moveSpeed * delta);
     }
 
     public void moveLeft(float delta) {
-        sprite.translateX(-moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged())
+            sprite.translateX(-moveSpeed * delta);
     }
 
     public void moveUp(float delta) {
-        sprite.translateY(moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged())
+            sprite.translateY(moveSpeed * delta);
     }
 
     public void moveDown(float delta) {
-        sprite.translateY(-moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged())
+            sprite.translateY(-moveSpeed * delta);
     }
 }

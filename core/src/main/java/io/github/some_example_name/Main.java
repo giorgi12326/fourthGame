@@ -14,7 +14,7 @@ import java.util.List;
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Character ch;
-    private OrthographicCamera camera;
+    public static OrthographicCamera camera;
     private Texture background;
     private List<Blupy> enemies;
 
@@ -88,12 +88,12 @@ public class Main extends ApplicationAdapter {
 
     private void handleInput() {
         float delta = Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) ch.dashToMouse.jumpToMouse();
         if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.A)) ch.moveLeft(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.D)) ch.moveRight(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.G)) enemies.add(new Blupy());
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) ch.dashToMouse.jumpToMouse();
 
         if (Gdx.input.isKeyPressed(Input.Keys.PLUS)) camera.zoom *= 0.99f;
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom *= 1.01f;
