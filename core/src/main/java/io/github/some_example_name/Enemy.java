@@ -1,6 +1,5 @@
 package io.github.some_example_name;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -8,31 +7,23 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 
-public class Blupy {
+public abstract class Enemy {
     Sprite sprite;
     private final Rectangle hurtBox = new Rectangle();
-    float fallback;
-    float moveSpeed = 5f;
+    float moveSpeed;
     Character ch;
-    List<Blupy> enemies;
-    float health = 30f;
+    float health;
     Cooldown hurtCooldown = new Cooldown(0.1f);
 
     public boolean markAsDeleted;
 
-    public Blupy(Vector2 position, float moveSpeed, Character ch, List<Blupy> enemies) {
-        sprite = new Sprite(new Texture("chara.png"));
-        sprite.setPosition(position.x, position.y);
-        sprite.setOriginCenter();
-        this.enemies = enemies;
+    public Enemy(float moveSpeed, Character ch) {
         this.ch = ch;
         this.moveSpeed = moveSpeed;
-        fallback = 10f;
     }
     public void update(){
         moveTowardsCharacter();
-
-        hurtCooldown.handleUpdateAndFlagging();
+        hurtCooldown.handleUpdateAndUnFlagging();
 
     }
 
@@ -63,7 +54,7 @@ public class Blupy {
         boolean shouldReturnY = false;
         sprite.translateX(scl.x);
 
-        for(Blupy enemy: enemies){
+        for(Enemy enemy: Main.enemies){
             if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnX = true;
         }
@@ -71,7 +62,7 @@ public class Blupy {
             sprite.translateX(-scl.x);
 
         sprite.translateY(scl.y);
-        for(Blupy enemy: enemies){
+        for(Enemy enemy: Main.enemies){
             if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnY = true;
         }

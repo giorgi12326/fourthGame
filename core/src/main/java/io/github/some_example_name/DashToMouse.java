@@ -24,6 +24,7 @@ public class DashToMouse {
     public void jumpToMouse() {
         if (jumpCooldown.isValid() && !jumpTimer.isFlagged()) {
             jumpTimer.flag();
+            ch.invincible = true;
             jumpCooldown.reset();
             Vector3 project = Main.camera.project(new Vector3(centerX(), centerY(), 0));
 
@@ -44,9 +45,9 @@ public class DashToMouse {
             ch.sprite.translateY(direction.y);
             jumpTimer.update();
             if (!jumpTimer.isValid()) {
+                ch.invincible = false;
                 jumpTimer.unflag();
                 jumpTimer.reset();
-
             }
         }
     }

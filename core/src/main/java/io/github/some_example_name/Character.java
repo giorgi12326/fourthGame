@@ -12,6 +12,7 @@ public class Character {
     float moveSpeed = 500;
     Sprite sprite;
     float health = 100f;
+    boolean invincible = false;
 
 
     public Character() {
@@ -24,11 +25,11 @@ public class Character {
         dashToMouse.update();
         circleAttack.update();
 
-        hurtCooldown.handleUpdateAndFlagging();
+        hurtCooldown.handleUpdateAndUnFlagging();
     }
 
     public void gotHit(){
-        if(!hurtCooldown.isFlagged()) {
+        if(!hurtCooldown.isFlagged() && !invincible) {
             health -= 10f;
             hurtCooldown.flag();
         }
