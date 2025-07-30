@@ -9,6 +9,7 @@ public class CircleAttack {
     Circle circle;
     public float radius = 100f;
     Cooldown cooldown = new Cooldown(1f);
+    Timer durationTimer = new Timer(0.1f);
     Character ch;
 
     public CircleAttack(Character ch){
@@ -16,15 +17,27 @@ public class CircleAttack {
         circle = new Circle();
     }
 
-    public void overlapsThis(Blupy blupy){
-        circle.set(ch.centerX(), ch.centerY() ,radius);
-        if(cooldown.isValid() && Intersector.overlaps(circle, blupy.updateHurtBox())) {
-            blupy.gotHit(new Vector2(ch.centerX(),ch.centerY()));
+    public void update() {
+        cooldown.update();
+        handleHitbox();
+    }
+
+    public void activate(){
+        if(cooldown.isValid() && !durationTimer.isFlagged()) {
+            durationTimer.flag();
             cooldown.reset();
         }
     }
 
-    public void update() {
-        cooldown.update();
+    public void handleHitbox(){
+        if(durationTimer.isFlagged()) {
+            durationTimer.update();
+            circle.set(ch.centerX(), ch.centerY(), radius);
+            if(!durationTimer.isValid()) {
+                durationTimer.unflag();
+                durationTimer.reset();
+            }
+
+        }
     }
 }

@@ -5,15 +5,25 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.List;
+
 
 public class Blupy {
     Sprite sprite;
-    Rectangle hurtBox = new Rectangle();
+    private final Rectangle hurtBox = new Rectangle();
     float fallback;
-    public Blupy() {
+    Character ch;
+    List<Blupy> enemies;
+
+    public Blupy(Character ch, List<Blupy> enemies) {
         sprite = new Sprite(new Texture("chara.png"));
         sprite.setOriginCenter();
+        this.enemies = enemies;
+        this.ch = ch;
         fallback = 10f;
+    }
+    public void update(){
+        moveTowardsCharacter();
     }
 
     public Rectangle updateHurtBox() {
@@ -26,5 +36,28 @@ public class Blupy {
         nor.scl(fallback);
         sprite.translateX(nor.x);
         sprite.translateY(nor.y);
+    }
+    public void moveTowardsCharacter(){
+        Vector2 scl = new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor().scl(5f);
+        boolean shouldReturnX = false;
+        boolean shouldReturnY = false;
+        sprite.translateX(scl.x);
+
+        for(Blupy enemy: enemies){
+            if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
+                shouldReturnX = true;
+        }
+        if(shouldReturnX)
+            sprite.translateX(-scl.x);
+as
+        sprite.translateY(scl.y);
+        for(Blupy enemy: enemies){
+            if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
+                shouldReturnY = true;
+        }
+        if(shouldReturnY)
+            sprite.translateY(-scl.y);
+
+
     }
 }

@@ -6,6 +6,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -18,6 +20,7 @@ public class Main extends ApplicationAdapter {
     public static OrthographicCamera camera;
     private Texture background;
     private List<Blupy> enemies;
+    ShapeRenderer shapeRenderer;
 
     // Camera control
     private static final float CAMERA_ZOOM = 0.75f;
@@ -29,7 +32,7 @@ public class Main extends ApplicationAdapter {
         ch = new Character();
         enemies = new ArrayList<>();
 
-        enemies.add(new Blupy());
+        enemies.add(new Blupy(ch,enemies));
 
         // Camera setup
         camera = new OrthographicCamera();
@@ -39,6 +42,8 @@ public class Main extends ApplicationAdapter {
         // Background setup
         background = new Texture("back.png");
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     @Override
@@ -55,12 +60,28 @@ public class Main extends ApplicationAdapter {
             CAMERA_SPEED
         );
         camera.update();
+        for (Blupy enemy : enemies) {
+            enemy.update();
+        }
+
+        for (Blupy enemy : enemies) {
+            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, enemy.updateHurtBox()))
+                enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()));
+        }
 
         handleInput();
         ch.update();
 
         batch.setProjectionMatrix(camera.combined);
         draw();
+
+        shapeRenderer.setAutoShapeType(true);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        if(ch.circleAttack.cooldown.isValid())
+            shapeRenderer.rect(30,30,50,50);
+        shapeRenderer.end();
+
     }
 
     private void draw() {
@@ -94,11 +115,9 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.A)) ch.moveLeft(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.D)) ch.moveRight(delta);
-        if (Gdx.input.isKeyPressed(Input.Keys.G)) enemies.add(new Blupy());
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) enemies.add(new Blupy(ch,enemies));
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            for (Blupy enemy : enemies) {
-                ch.circleAttack(enemy);
-            }
+            ch.circleAttack.activate();
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.PLUS)) camera.zoom *= 0.99f;
