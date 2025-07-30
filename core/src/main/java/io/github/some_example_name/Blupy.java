@@ -12,6 +12,7 @@ public class Blupy {
     Sprite sprite;
     private final Rectangle hurtBox = new Rectangle();
     float fallback;
+    float moveSpeed = 5f;
     Character ch;
     List<Blupy> enemies;
 
@@ -31,14 +32,17 @@ public class Blupy {
         return hurtBox;
     }
 
-    public void gotHit(Vector2 vector2) {
-        Vector2 nor = new Vector2(sprite.getX() - vector2.x, sprite.getY() - vector2.y).nor();
-        nor.scl(fallback);
-        sprite.translateX(nor.x);
-        sprite.translateY(nor.y);
+    public void gotHit(Vector2 vector2, float impact) {
+        Vector2 scl = new Vector2(sprite.getX() - vector2.x, sprite.getY() - vector2.y).nor().scl(impact);
+        moveEachDirectionIfCan(scl);
     }
+
     public void moveTowardsCharacter(){
-        Vector2 scl = new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor().scl(5f);
+        Vector2 scl = new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor().scl(moveSpeed);
+        moveEachDirectionIfCan(scl);
+    }
+
+    private void moveEachDirectionIfCan(Vector2 scl) {
         boolean shouldReturnX = false;
         boolean shouldReturnY = false;
         sprite.translateX(scl.x);
@@ -49,7 +53,7 @@ public class Blupy {
         }
         if(shouldReturnX)
             sprite.translateX(-scl.x);
-as
+
         sprite.translateY(scl.y);
         for(Blupy enemy: enemies){
             if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
@@ -57,7 +61,5 @@ as
         }
         if(shouldReturnY)
             sprite.translateY(-scl.y);
-
-
     }
 }

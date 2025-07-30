@@ -50,7 +50,6 @@ public class Main extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        // Smooth camera follow
         camera.position.lerp(
             new com.badlogic.gdx.math.Vector3(
                 ch.sprite.getX() + ch.sprite.getWidth()/2,
@@ -66,7 +65,7 @@ public class Main extends ApplicationAdapter {
 
         for (Blupy enemy : enemies) {
             if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, enemy.updateHurtBox()))
-                enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()));
+                enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()),10f);
         }
 
         handleInput();
@@ -88,9 +87,14 @@ public class Main extends ApplicationAdapter {
         batch.begin();
         drawBackground();
         ch.sprite.draw(batch);
+        if(ch.circleAttack.durationTimer.isFlagged())
+            batch.draw(ch.circleAttack.animation.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX()-128, ch.centerY()-128,
+                256,256);
+
         for(Blupy blupy : enemies) {
             blupy.sprite.draw(batch);
         }
+
         batch.end();
     }
 

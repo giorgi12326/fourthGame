@@ -46,6 +46,7 @@ public class DashToMouse {
             if (!jumpTimer.isValid()) {
                 jumpTimer.unflag();
                 jumpTimer.reset();
+
             }
         }
     }

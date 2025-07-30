@@ -21,7 +21,6 @@ public class Character {
         circleAttack.update();
     }
 
-
     public void moveRight(float delta) {
         if(!dashToMouse.jumpTimer.isFlagged())
             sprite.translateX(moveSpeed * delta);
