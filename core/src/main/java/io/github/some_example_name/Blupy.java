@@ -15,16 +15,25 @@ public class Blupy {
     float moveSpeed = 5f;
     Character ch;
     List<Blupy> enemies;
+    float health = 30f;
+    Cooldown hurtCooldown = new Cooldown(0.1f);
 
-    public Blupy(Character ch, List<Blupy> enemies) {
+    public boolean markAsDeleted;
+
+    public Blupy(Vector2 position, float moveSpeed, Character ch, List<Blupy> enemies) {
         sprite = new Sprite(new Texture("chara.png"));
+        sprite.setPosition(position.x, position.y);
         sprite.setOriginCenter();
         this.enemies = enemies;
         this.ch = ch;
+        this.moveSpeed = moveSpeed;
         fallback = 10f;
     }
     public void update(){
         moveTowardsCharacter();
+
+        hurtCooldown.handleUpdateAndFlagging();
+
     }
 
     public Rectangle updateHurtBox() {
@@ -33,8 +42,15 @@ public class Blupy {
     }
 
     public void gotHit(Vector2 vector2, float impact) {
-        Vector2 scl = new Vector2(sprite.getX() - vector2.x, sprite.getY() - vector2.y).nor().scl(impact);
-        moveEachDirectionIfCan(scl);
+        if(!hurtCooldown.isFlagged()) {
+            hurtCooldown.flag();
+
+            Vector2 scl = new Vector2(sprite.getX() - vector2.x, sprite.getY() - vector2.y).nor().scl(impact);
+            moveEachDirectionIfCan(scl);
+            health -= 10f;
+            if (health <= 0)
+                markAsDeleted = true;
+        }
     }
 
     public void moveTowardsCharacter(){

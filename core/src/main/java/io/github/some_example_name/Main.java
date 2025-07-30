@@ -3,8 +3,10 @@ package io.github.some_example_name;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
@@ -22,7 +24,6 @@ public class Main extends ApplicationAdapter {
     private List<Blupy> enemies;
     ShapeRenderer shapeRenderer;
 
-    // Camera control
     private static final float CAMERA_ZOOM = 0.75f;
     private static final float CAMERA_SPEED = 0.1f;
 
@@ -32,14 +33,10 @@ public class Main extends ApplicationAdapter {
         ch = new Character();
         enemies = new ArrayList<>();
 
-        enemies.add(new Blupy(ch,enemies));
-
-        // Camera setup
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = CAMERA_ZOOM;
 
-        // Background setup
         background = new Texture("back.png");
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
@@ -60,12 +57,21 @@ public class Main extends ApplicationAdapter {
         );
         camera.update();
         for (Blupy enemy : enemies) {
+
             enemy.update();
+            if(enemy.updateHurtBox().overlaps(ch.updateHurtBox()))
+                ch.gotHit();
+        }
+
+        for (int i = enemies.size()-1; i >= 0; i--) {
+            Blupy enemy = enemies.get(i);
+            if(enemy.markAsDeleted)
+                enemies.remove(enemy);
         }
 
         for (Blupy enemy : enemies) {
             if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, enemy.updateHurtBox()))
-                enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()),10f);
+                enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f);
         }
 
         handleInput();
@@ -79,6 +85,10 @@ public class Main extends ApplicationAdapter {
 
         if(ch.circleAttack.cooldown.isValid())
             shapeRenderer.rect(30,30,50,50);
+
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(400,100,11.2f*ch.health,50);
+
         shapeRenderer.end();
 
     }
@@ -115,11 +125,24 @@ public class Main extends ApplicationAdapter {
     private void handleInput() {
         float delta = Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) ch.dashToMouse.jumpToMouse();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            float radius = 1000;
+            int numEnemies = 12;
+            Vector2 center = new Vector2(ch.centerX(), ch.centerY());
+
+            for (int i = 0; i < numEnemies; i++) {
+                float angle = (float)(2 * Math.PI * i / numEnemies);
+                float x = center.x + radius * (float)Math.cos(angle);
+                float y = center.y + radius * (float)Math.sin(angle);
+
+                enemies.add(new Blupy(new Vector2(x, y),2f, ch, enemies));
+            }
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.A)) ch.moveLeft(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.D)) ch.moveRight(delta);
-        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) enemies.add(new Blupy(ch,enemies));
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) enemies.add(new Blupy(new Vector2(),10f, ch,enemies));
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             ch.circleAttack.activate();
         }

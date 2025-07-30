@@ -2,13 +2,17 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Character {
     final DashToMouse dashToMouse;
     CircleAttack circleAttack = new CircleAttack(this);
+    Rectangle hurtBox = new Rectangle();
+    Cooldown hurtCooldown = new Cooldown(0.1f);
     float moveSpeed = 500;
     Sprite sprite;
+    float health = 100f;
+
 
     public Character() {
         sprite = new Sprite(new Texture("block.png"));
@@ -19,6 +23,20 @@ public class Character {
     public void update() {
         dashToMouse.update();
         circleAttack.update();
+
+        hurtCooldown.handleUpdateAndFlagging();
+    }
+
+    public void gotHit(){
+        if(!hurtCooldown.isFlagged()) {
+            health -= 10f;
+            hurtCooldown.flag();
+        }
+    }
+
+    public Rectangle updateHurtBox() {
+        hurtBox.set(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        return hurtBox;
     }
 
     public void moveRight(float delta) {
