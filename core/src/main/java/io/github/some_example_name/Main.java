@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -26,6 +27,7 @@ public class Main extends ApplicationAdapter {
 
     private static final float CAMERA_ZOOM = 0.75f;
     private static final float CAMERA_SPEED = 0.1f;
+    public static Random random;
 
     @Override
     public void create() {
@@ -33,6 +35,8 @@ public class Main extends ApplicationAdapter {
         ch = new Character();
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
+
+        random = new Random();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -161,6 +165,22 @@ public class Main extends ApplicationAdapter {
                 float y = center.y + radius * (float)Math.sin(angle);
 
                 enemies.add(new Blurpy(new Vector2(x, y),2f, ch));
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            float radius = 1000;
+            int numEnemies = 12;
+            Vector2 center = new Vector2(ch.centerX(), ch.centerY());
+
+            for (int i = 0; i < numEnemies; i++) {
+                float angle = (float)(2 * Math.PI * i / numEnemies);
+                float x = center.x + radius * (float)Math.cos(angle);
+                float y = center.y + radius * (float)Math.sin(angle);
+
+                if(i%2 == 0)
+                    enemies.add(new Blurpy(new Vector2(x, y),2f, ch));
+                else
+                    enemies.add(new Booper(new Vector2(x, y),2f, ch));
             }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);

@@ -17,4 +17,5 @@ public class Blurpy extends Enemy{
         this.moveSpeed = 5f;
         this.health = 30f;
     }
+
 }

@@ -24,7 +24,6 @@ public abstract class Enemy {
     public void update(){
         moveTowardsCharacter();
         hurtCooldown.handleUpdateAndUnFlagging();
-
     }
 
     public Rectangle updateHurtBox() {
@@ -49,7 +48,8 @@ public abstract class Enemy {
         moveEachDirectionIfCan(scl);
     }
 
-    private void moveEachDirectionIfCan(Vector2 scl) {
+
+    public void moveEachDirectionIfCan(Vector2 scl) {
         boolean shouldReturnX = false;
         boolean shouldReturnY = false;
         sprite.translateX(scl.x);
