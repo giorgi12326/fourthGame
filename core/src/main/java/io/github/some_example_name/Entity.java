@@ -4,10 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.List;
 
-
-public abstract class Enemy {
+public abstract class Entity {
     Sprite sprite;
     private final Rectangle hurtBox = new Rectangle();
     float moveSpeed;
@@ -17,7 +15,7 @@ public abstract class Enemy {
 
     public boolean markAsDeleted;
 
-    public Enemy(float moveSpeed, Character ch) {
+    public Entity(float moveSpeed, Character ch) {
         this.ch = ch;
         this.moveSpeed = moveSpeed;
     }
@@ -48,22 +46,21 @@ public abstract class Enemy {
         moveEachDirectionIfCan(scl);
     }
 
-
     public void moveEachDirectionIfCan(Vector2 scl) {
         boolean shouldReturnX = false;
         boolean shouldReturnY = false;
         sprite.translateX(scl.x);
 
-        for(Enemy enemy: Main.enemies){
-            if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
+        for(Entity entity : Main.enemies){
+            if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnX = true;
         }
         if(shouldReturnX)
             sprite.translateX(-scl.x);
 
         sprite.translateY(scl.y);
-        for(Enemy enemy: Main.enemies){
-            if(enemy != this && enemy.updateHurtBox().overlaps(updateHurtBox()))
+        for(Entity entity : Main.enemies){
+            if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnY = true;
         }
         if(shouldReturnY)

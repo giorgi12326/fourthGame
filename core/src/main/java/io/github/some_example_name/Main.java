@@ -21,7 +21,7 @@ public class Main extends ApplicationAdapter {
     private Character ch;
     public static OrthographicCamera camera;
     private Texture background;
-    public static List<Enemy> enemies;
+    public static List<Entity> enemies;
     public static List<Projectile> projectiles;
     ShapeRenderer shapeRenderer;
 
@@ -61,9 +61,10 @@ public class Main extends ApplicationAdapter {
             CAMERA_SPEED
         );
         camera.update();
-        for (Enemy enemy : enemies) {
-            enemy.update();
-            if(enemy.updateHurtBox().overlaps(ch.updateHurtBox()))
+
+        for (Entity entity : enemies) {
+            entity.update();
+            if(entity.updateHurtBox().overlaps(ch.updateHurtBox()))
                 ch.gotHit();
         }
 
@@ -80,9 +81,9 @@ public class Main extends ApplicationAdapter {
         }
 
         for (int i = enemies.size()-1; i >= 0; i--) {
-            Enemy enemy = enemies.get(i);
-            if(enemy.markAsDeleted)
-                enemies.remove(enemy);
+            Entity entity = enemies.get(i);
+            if(entity.markAsDeleted)
+                enemies.remove(entity);
         }
         for (int i = projectiles.size()-1; i >= 0; i--) {
             Projectile enemy = projectiles.get(i);
@@ -90,9 +91,9 @@ public class Main extends ApplicationAdapter {
                 projectiles.remove(enemy);
         }
 
-        for (Enemy enemy : enemies) {
-            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, enemy.updateHurtBox()))
-                enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f);
+        for (Entity entity : enemies) {
+            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, entity.updateHurtBox()))
+                entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f);
         }
         for (Projectile projectile : projectiles) {
             if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, projectile.updateHurtBox())) {
@@ -123,12 +124,19 @@ public class Main extends ApplicationAdapter {
         batch.begin();
         drawBackground();
         ch.sprite.draw(batch);
-        if(ch.circleAttack.durationTimer.isFlagged())
-            batch.draw(ch.circleAttack.animation.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX()-128, ch.centerY()-128,
+        if(ch.circleAttack.durationTimer.isFlagged()){
+            if(ch.circleAttack.clockwise)
+                batch.draw(ch.circleAttack.animationClockwise.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX()-128, ch.centerY()-128,
                 256,256);
+            else {
+                batch.draw(ch.circleAttack.animationCounterClockwise.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX() - 128, ch.centerY() - 128,
+                    256, 256);
+            }
+        }
 
-        for(Enemy enemy : enemies) {
-            enemy.sprite.draw(batch);
+
+        for(Entity entity : enemies) {
+            entity.sprite.draw(batch);
         }
         for(Projectile projectile : projectiles) {
             projectile.sprite.draw(batch);
@@ -187,6 +195,7 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.A)) ch.moveLeft(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.D)) ch.moveRight(delta);
+        if (Gdx.input.isKeyPressed(Input.Keys.P)) enemies.add(new Wood(new Vector2(), 0f,ch));
         if (Gdx.input.isKeyJustPressed(Input.Keys.G)) enemies.add(new Booper(new Vector2(),10f, ch));
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             ch.circleAttack.activate();

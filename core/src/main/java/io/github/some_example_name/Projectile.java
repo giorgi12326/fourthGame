@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
-public class Projectile extends Enemy{
+public class Projectile extends Entity {
     Vector2 direction;
     public Projectile(Vector2 position, Vector2 direction, Character ch){
         super(500f, ch);
@@ -16,9 +16,7 @@ public class Projectile extends Enemy{
         this.direction = direction;
     }
 
-
     public void update(){
         sprite.translate(direction.x, direction.y);
-
     }
 }

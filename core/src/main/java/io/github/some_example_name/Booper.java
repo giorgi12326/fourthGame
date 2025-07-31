@@ -1,14 +1,10 @@
 package io.github.some_example_name;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.List;
-import java.util.Random;
-
-public class Booper extends Enemy{
+public class Booper extends Entity {
 
     Cooldown attackSpeed = new Cooldown(1f);
     int state = 0;
@@ -23,7 +19,7 @@ public class Booper extends Enemy{
         sprite = new Sprite(new Texture("booper.png"));
         sprite.setPosition(position.x,position.y);
         this.moveSpeed = 5f;
-        this.health = 30f;
+        this.health = 20f;
     }
 
     @Override
@@ -46,6 +42,7 @@ public class Booper extends Enemy{
         else
             moveTowardsCharacter();
     }
+
     public void movePerpendicularFromCharacter(){
         Vector2 scl = new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor().scl(moveSpeed);
         Vector2 perpendicular;

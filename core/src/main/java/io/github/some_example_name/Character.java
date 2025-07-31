@@ -15,6 +15,8 @@ public class Character {
     boolean invincible = false;
 
 
+    float greenoAmount;
+
     public Character() {
         sprite = new Sprite(new Texture("block.png"));
         sprite.setOriginCenter();
@@ -24,7 +26,6 @@ public class Character {
     public void update() {
         dashToMouse.update();
         circleAttack.update();
-
         hurtCooldown.handleUpdateAndUnFlagging();
     }
 
