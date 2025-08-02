@@ -33,12 +33,20 @@ public abstract class Entity {
         if(!hurtCooldown.isFlagged()) {
             hurtCooldown.flag();
 
-            Vector2 scl = new Vector2(sprite.getX() - vector2.x, sprite.getY() - vector2.y).nor().scl(impact);
-            moveEachDirectionIfCan(scl);
+            knockback(vector2, impact);
             health -= 10f;
-            if (health <= 0)
+
+            if (health <= 0) {
+                ch.circleAttack.cooldown.finish();
+                ch.dashToMouse.cooldown.finish();
                 markAsDeleted = true;
+            }
         }
+    }
+
+    public void knockback(Vector2 vector2, float impact) {
+        Vector2 scl = new Vector2(sprite.getX() - vector2.x, sprite.getY() - vector2.y).nor().scl(impact);
+        moveEachDirectionIfCan(scl);
     }
 
     public void moveTowardsCharacter(){
@@ -72,7 +80,7 @@ public abstract class Entity {
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnY = true;
         }
-        if(shouldReturnY)
+         if(shouldReturnY)
             sprite.translateY(-scl.y);
     }
 }

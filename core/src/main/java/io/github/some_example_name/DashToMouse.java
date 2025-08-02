@@ -10,7 +10,7 @@ public class DashToMouse {
     Vector2 direction;
 
     public Timer jumpTimer = new Timer(0.2f);
-    Cooldown jumpCooldown = new Cooldown(0.5f);
+    Cooldown cooldown = new Cooldown(0.5f);
 
     public DashToMouse(Character ch) {
         this.ch = ch;
@@ -18,15 +18,16 @@ public class DashToMouse {
 
     public void update() {
         handleJump();
-        jumpCooldown.update();
+        cooldown.update();
     }
 
     public void jumpToMouse() {
-        if (jumpCooldown.isValid() && !jumpTimer.isFlagged()) {
+        if (cooldown.isValid() && !jumpTimer.isFlagged()) {
             ch.circleAttack.cooldown.finish();
+            ch.dashToMouse.cooldown.finish();
             jumpTimer.flag();
             ch.invincible = true;
-            jumpCooldown.reset();
+            cooldown.reset();
             Vector3 project = Main.camera.project(new Vector3(centerX(), centerY(), 0));
 
             float mouseX = Gdx.input.getX() - project.x;

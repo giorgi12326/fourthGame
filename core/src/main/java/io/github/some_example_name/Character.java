@@ -29,13 +29,11 @@ public class Character extends Entity{
     public void gotHit(){
         if(!hurtCooldown.isFlagged() && !invincible) {
             health -= 10f;
+            if(health <= 0){
+                markAsDeleted = true;
+            }
             hurtCooldown.flag();
         }
-    }
-
-    public Rectangle updateHurtBox() {
-        hurtBox.set(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-        return hurtBox;
     }
 
     public void moveRight(float delta) {

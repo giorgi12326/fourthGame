@@ -18,7 +18,7 @@ public class Booper extends Entity {
 
         sprite = new Sprite(new Texture("booper.png"));
         sprite.setPosition(position.x,position.y);
-        this.moveSpeed = 5f;
+        this.moveSpeed = 4f;
         this.health = 20f;
     }
 

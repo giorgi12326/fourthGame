@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -26,7 +27,7 @@ public class Main extends ApplicationAdapter {
     private Texture background;
     public static List<Entity> enemies;
     public static List<Entity> terrains;
-    public static List<Projectile> projectiles;
+    public static List<Entity> projectiles;
     ShapeRenderer shapeRenderer;
     BitmapFont font;
 
@@ -61,16 +62,24 @@ public class Main extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
+        draw();
+        if(ch.markAsDeleted) return;
+        ch.update();
+        updateEntityList(enemies);
+        updateEntityList(projectiles);
+        updateEntityList(terrains);
+
+        garbageRemoveList(enemies);
+        garbageRemoveList(projectiles);
+        garbageRemoveList(terrains);
 
         for (Entity entity : enemies) {
-            entity.update();
             if(entity.updateHurtBox().overlaps(ch.updateHurtBox())){
                 ch.gotHit();
             }
         }
 
-        for (Projectile projectile : projectiles) {
-            projectile.update();
+        for (Entity projectile : projectiles) {
             if(projectile.updateHurtBox().overlaps(ch.updateHurtBox())){
                 projectile.markAsDeleted = true;
                 ch.gotHit();
@@ -78,8 +87,7 @@ public class Main extends ApplicationAdapter {
         }
 
         for(Entity terrain: terrains) {
-            terrain.update();
-            for (Projectile projectile : projectiles) {
+            for (Entity projectile : projectiles) {
                 if (projectile.updateHurtBox().overlaps(terrain.updateHurtBox())) {
                     projectile.markAsDeleted = true;
                     terrain.gotHit(new Vector2(),0);
@@ -87,59 +95,40 @@ public class Main extends ApplicationAdapter {
             }
         }
 
-        for (int i = enemies.size()-1; i >= 0; i--) {
-            Entity entity = enemies.get(i);
-            if(entity.markAsDeleted)
-                enemies.remove(entity);
-        }
-
-        for (int i = projectiles.size()-1; i >= 0; i--) {
-            Projectile enemy = projectiles.get(i);
-            if(enemy.markAsDeleted)
-                projectiles.remove(enemy);
-        }
-
-        for (int i = terrains.size()-1; i >= 0; i--) {
-            Entity enemy = terrains.get(i);
-            if(enemy.markAsDeleted)
-                terrains.remove(enemy);
-        }
-
-        for (Entity entity : enemies) {
-            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, entity.updateHurtBox()))
-                entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f);
-        }
-
-        for (Entity entity : projectiles) {
-            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, entity.updateHurtBox())) {
-                entity.gotHit(new Vector2(),0f);
-                ch.circleAttack.cooldown.finish();
+        ifCircleAttacksExecuteThis(enemies,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f));
+        ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(),0f));
+        ifCircleAttacksExecuteThis(projectiles ,(Entity entity)-> {
+            entity.gotHit(new Vector2(),0f);
+            ch.dashToMouse.cooldown.finish();
+            ch.circleAttack.cooldown.finish();
             }
-        }
-
-        for (Entity entity : terrains) {
-            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, entity.updateHurtBox())) {
-                entity.gotHit(new Vector2(),0f);
-            }
-        }
-        camera.position.lerp(
-            new com.badlogic.gdx.math.Vector3(
-                ch.sprite.getX() + ch.sprite.getWidth()/2,
-                ch.sprite.getY() + ch.sprite.getHeight()/2,
-                0
-            ),
-            CAMERA_SPEED
         );
-        camera.position.x = Math.round(camera.position.x);
-        camera.position.y = Math.round(camera.position.y);
 
-        camera.update();
+
+        updateCamera();
 
         handleInput();
-        ch.update();
 
-        draw();
+        drawGridLines();
+        drawHUD();
+    }
 
+    private void drawHUD() {
+        shapeRenderer.setAutoShapeType(true);
+        shapeRenderer.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        if (ch.circleAttack.cooldown.isValid())
+            shapeRenderer.rect(30, 30, 50, 50);
+
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(400, 100, 11.2f * ch.health, 50);
+
+
+        shapeRenderer.end();
+    }
+
+    private void drawGridLines() {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
@@ -156,61 +145,79 @@ public class Main extends ApplicationAdapter {
             }
         }
         shapeRenderer.end();
+    }
 
-        //------
+    private void updateCamera() {
+        camera.position.lerp(
+            new Vector3(
+                ch.sprite.getX() + ch.sprite.getWidth()/2,
+                ch.sprite.getY() + ch.sprite.getHeight()/2,
+                0
+            ),
+            CAMERA_SPEED
+        );
+        camera.position.x = Math.round(camera.position.x);
+        camera.position.y = Math.round(camera.position.y);
 
-        shapeRenderer.setAutoShapeType(true);
-        shapeRenderer.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        camera.update();
+    }
 
-        if (ch.circleAttack.cooldown.isValid())
-            shapeRenderer.rect(30, 30, 50, 50);
+    private static void updateEntityList(List<Entity> list) {
+        for (Entity entity : list) {
+            entity.update();
+        }
+    }
 
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(400, 100, 11.2f * ch.health, 50);
+    private void ifCircleAttacksExecuteThis(List<Entity> list, Consumer<Entity> consumer) {
+        for (Entity entity : list) {
+            if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, entity.updateHurtBox()))
+                consumer.accept(entity);
+        }
+    }
 
-
-        shapeRenderer.end();
-
-
+    private static void garbageRemoveList(List<Entity> enemies) {
+        for (int i = enemies.size() - 1; i >= 0; i--) {
+            Entity entity = enemies.get(i);
+            if (entity.markAsDeleted)
+                enemies.remove(entity);
+        }
     }
 
     private void draw() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         drawBackground();
-        ch.sprite.draw(batch);
 
-        if(ch.circleAttack.durationTimer.isFlagged()){
-            if(ch.circleAttack.clockwise)
-                batch.draw(ch.circleAttack.animationClockwise.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX()-128, ch.centerY()-128,
-                256,256);
-            else {
-                batch.draw(ch.circleAttack.animationCounterClockwise.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX() - 128, ch.centerY() - 128,
-                    256, 256);
+        drawEntityList(enemies);
+        drawEntityList(terrains);
+        drawEntityList(projectiles);
+
+        if(!ch.markAsDeleted) {
+            ch.sprite.draw(batch);
+
+            if (ch.circleAttack.durationTimer.isFlagged()) {
+                if (ch.circleAttack.clockwise)
+                    batch.draw(ch.circleAttack.animationClockwise.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX() - 128, ch.centerY() - 128,
+                        256, 256);
+                else {
+                    batch.draw(ch.circleAttack.animationCounterClockwise.getKeyFrame(ch.circleAttack.animationTimer.currentTimer), ch.centerX() - 128, ch.centerY() - 128,
+                        256, 256);
+                }
             }
-        }
 
-        for(Entity entity : enemies) {
+            batch.end();
+
+            batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+            batch.begin();
+            font.draw(batch, String.valueOf(ch.wood), 30, 120);
+        }
+        batch.end();
+    }
+
+    private void drawEntityList(List<Entity> enemies) {
+        for (Entity entity : enemies) {
             entity.sprite.draw(batch);
         }
-
-        for(Entity entity : enemies) {
-            entity.sprite.draw(batch);
-        }
-        for(Entity terrain : terrains) {
-            terrain.sprite.draw(batch);
-        }
-        for(Projectile projectile : projectiles) {
-            projectile.sprite.draw(batch);
-        }
-
-        batch.end();
-
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-        batch.begin();
-        font.draw(batch, String.valueOf(ch.wood), 30, 120);
-        batch.end();
     }
 
     private void drawBackground() {
