@@ -23,6 +23,7 @@ public class DashToMouse {
 
     public void jumpToMouse() {
         if (jumpCooldown.isValid() && !jumpTimer.isFlagged()) {
+            ch.circleAttack.cooldown.finish();
             jumpTimer.flag();
             ch.invincible = true;
             jumpCooldown.reset();
@@ -41,7 +42,27 @@ public class DashToMouse {
 
     public void handleJump() {
         if (jumpTimer.isFlagged()) {
-            ch.moveEachDirectionIfCan(direction);
+            boolean shouldReturnX = false;
+
+            ch.sprite.translateX(direction.x);
+            for(Entity entity : Main.terrains){
+                if(entity != ch && entity.updateHurtBox().overlaps(ch.updateHurtBox()))
+                    shouldReturnX = true;
+            }
+
+            if(shouldReturnX)
+                ch.sprite.translateX(-direction.x);
+
+            boolean shouldReturnY = false;
+
+            ch.sprite.translateY(direction.y);
+            for(Entity entity : Main.terrains){
+                if(entity != ch && entity.updateHurtBox().overlaps(ch.updateHurtBox()))
+                    shouldReturnY = true;
+            }
+
+            if(shouldReturnY)
+                ch.sprite.translateY(-direction.y);
             jumpTimer.update();
             if (!jumpTimer.isValid()) {
                 ch.invincible = false;

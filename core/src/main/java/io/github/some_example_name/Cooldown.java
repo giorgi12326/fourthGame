@@ -35,6 +35,10 @@ public class Cooldown {
         currentTimer = duration;
     }
 
+    public void finish() {
+        currentTimer = 0;
+    }
+
     public void handleUpdateAndUnFlagging() {
         if(isFlagged()) {
             update();

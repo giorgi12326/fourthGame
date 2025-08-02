@@ -48,7 +48,6 @@ public abstract class Entity {
 
     public void moveEachDirectionIfCan(Vector2 scl) {
         boolean shouldReturnX = false;
-        boolean shouldReturnY = false;
 
         sprite.translateX(scl.x);
         for(Entity entity : Main.terrains){
@@ -61,6 +60,8 @@ public abstract class Entity {
         }
         if(shouldReturnX)
             sprite.translateX(-scl.x);
+
+        boolean shouldReturnY = false;
 
         sprite.translateY(scl.y);
         for(Entity entity : Main.terrains){

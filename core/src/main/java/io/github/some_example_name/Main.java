@@ -113,6 +113,7 @@ public class Main extends ApplicationAdapter {
         for (Entity entity : projectiles) {
             if(ch.circleAttack.durationTimer.isFlagged() && Intersector.overlaps(ch.circleAttack.circle, entity.updateHurtBox())) {
                 entity.gotHit(new Vector2(),0f);
+                ch.circleAttack.cooldown.finish();
             }
         }
 
@@ -253,7 +254,7 @@ public class Main extends ApplicationAdapter {
                 float x = center.x + radius * (float)Math.cos(angle);
                 float y = center.y + radius * (float)Math.sin(angle);
 
-                terrains.add(new Wood(new Vector2(x, y),2f, ch));
+                terrains.add(new Greeno(new Vector2(x, y),2f, ch));
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
@@ -291,7 +292,7 @@ public class Main extends ApplicationAdapter {
                 terrains.add(new Block(new Vector2(snappedX, snappedY), 10f, ch));
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) terrains.add(new Wood(new Vector2(), 0f,ch));
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) terrains.add(new Greeno(new Vector2(), 0f,ch));
         if (Gdx.input.isKeyJustPressed(Input.Keys.G)) enemies.add(new Booper(new Vector2(),10f, ch));
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             ch.circleAttack.activate();
