@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Character {
+public class Character extends Entity{
     final DashToMouse dashToMouse;
     CircleAttack circleAttack = new CircleAttack(this);
     Rectangle hurtBox = new Rectangle();
@@ -14,10 +14,11 @@ public class Character {
     float health = 100f;
     boolean invincible = false;
 
+    float wood;
 
-    float greenoAmount;
-
-    public Character() {
+    public Character(float moveSpeed) {
+        super(moveSpeed, null);
+        this.ch = this;
         sprite = new Sprite(new Texture("block.png"));
         sprite.setOriginCenter();
         dashToMouse = new DashToMouse(this);
@@ -42,23 +43,64 @@ public class Character {
     }
 
     public void moveRight(float delta) {
-        if(!dashToMouse.jumpTimer.isFlagged())
-            sprite.translateX(moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged()){
+            boolean shouldReturnX = false;
+
+            sprite.translateX(moveSpeed*delta);
+
+            for(Entity entity : Main.terrains){
+                if( entity.updateHurtBox().overlaps(updateHurtBox()))
+                    shouldReturnX = true;
+            }
+            if(shouldReturnX)
+                sprite.translateX(-moveSpeed * delta);
+        }
     }
 
     public void moveLeft(float delta) {
-        if(!dashToMouse.jumpTimer.isFlagged())
-            sprite.translateX(-moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged()){
+            boolean shouldReturnX = false;
+
+            sprite.translateX(-moveSpeed*delta);
+
+            for(Entity entity : Main.terrains){
+                if( entity.updateHurtBox().overlaps(updateHurtBox()))
+                    shouldReturnX = true;
+            }
+            if(shouldReturnX)
+                sprite.translateX(moveSpeed * delta);
+        }
     }
 
     public void moveUp(float delta) {
-        if(!dashToMouse.jumpTimer.isFlagged())
-            sprite.translateY(moveSpeed * delta);
+        if(!dashToMouse.jumpTimer.isFlagged()){
+            boolean shouldReturnY = false;
+
+            sprite.translateY(moveSpeed*delta);
+
+            for(Entity entity : Main.terrains){
+                if( entity.updateHurtBox().overlaps(updateHurtBox()))
+                    shouldReturnY = true;
+            }
+            if(shouldReturnY)
+                sprite.translateY(-moveSpeed * delta);
+        }
     }
 
     public void moveDown(float delta) {
-        if(!dashToMouse.jumpTimer.isFlagged())
-            sprite.translateY(-moveSpeed * delta);
+
+        if(!dashToMouse.jumpTimer.isFlagged()) {
+            boolean shouldReturnY = false;
+
+            sprite.translateY(-moveSpeed*delta);
+
+            for(Entity entity : Main.terrains){
+                if( entity.updateHurtBox().overlaps(updateHurtBox()))
+                    shouldReturnY = true;
+            }
+            if(shouldReturnY)
+                sprite.translateY(moveSpeed * delta);
+        }
     }
 
     public float centerX(){

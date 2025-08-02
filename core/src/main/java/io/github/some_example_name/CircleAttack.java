@@ -64,9 +64,7 @@ public class CircleAttack {
                 durationTimer.reset();
                 animationTimer.reset();
                 rotation = 0;
-
             }
-
         }
     }
 

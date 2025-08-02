@@ -11,7 +11,7 @@ public class Blurpy extends Entity {
         sprite = new Sprite(new Texture("chara.png"));
         sprite.setPosition(position.x, position.y);
         sprite.setOriginCenter();
-        this.moveSpeed = 5f;
+        this.moveSpeed = 2f;
         this.health = 30f;
     }
 

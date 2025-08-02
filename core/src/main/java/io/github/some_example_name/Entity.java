@@ -44,6 +44,7 @@ public abstract class Entity {
     public void moveTowardsCharacter(){
         Vector2 scl = new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor().scl(moveSpeed);
         moveEachDirectionIfCan(scl);
+        moveEachDirectionIfCan(scl);
     }
 
     public void moveEachDirectionIfCan(Vector2 scl) {
@@ -51,7 +52,11 @@ public abstract class Entity {
         boolean shouldReturnY = false;
         sprite.translateX(scl.x);
 
-        for(Entity entity : Main.enemies){
+        for(Entity entity : Main.terrains){
+            if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
+                shouldReturnX = true;
+        }
+        for(Entity entity :  Main.enemies){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnX = true;
         }
@@ -59,6 +64,10 @@ public abstract class Entity {
             sprite.translateX(-scl.x);
 
         sprite.translateY(scl.y);
+        for(Entity entity : Main.terrains){
+            if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
+                shouldReturnY = true;
+        }
         for(Entity entity : Main.enemies){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnY = true;

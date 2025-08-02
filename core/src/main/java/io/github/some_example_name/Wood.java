@@ -11,16 +11,21 @@ public class Wood extends Entity{
         sprite.setPosition(position.x, position.y);
         sprite.setOriginCenter();
         this.moveSpeed = 5f;
-        this.health = 100f;
+        this.health = 50f;
     }
 
     @Override
-    public void moveTowardsCharacter() {
-
+    public void update() {
+        hurtCooldown.handleUpdateAndUnFlagging();
     }
 
-    @Override
     public void gotHit(Vector2 vector2, float impact) {
-        super.gotHit(vector2, impact);
+        if(!hurtCooldown.isFlagged()) {
+            hurtCooldown.flag();
+            health -= 10f;
+            ch.wood +=10f;
+            if (health <= 0)
+                markAsDeleted = true;
+        }
     }
 }
