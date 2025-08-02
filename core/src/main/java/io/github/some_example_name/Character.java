@@ -7,13 +7,8 @@ import com.badlogic.gdx.math.Rectangle;
 public class Character extends Entity{
     final DashToMouse dashToMouse;
     CircleAttack circleAttack = new CircleAttack(this);
-    Rectangle hurtBox = new Rectangle();
     Cooldown hurtCooldown = new Cooldown(0.1f);
-    float moveSpeed = 500;
-    Sprite sprite;
-    float health = 100f;
     boolean invincible = false;
-
     float wood;
 
     public Character(float moveSpeed) {
@@ -22,6 +17,7 @@ public class Character extends Entity{
         sprite = new Sprite(new Texture("block.png"));
         sprite.setOriginCenter();
         dashToMouse = new DashToMouse(this);
+        health = 100f;
     }
 
     public void update() {

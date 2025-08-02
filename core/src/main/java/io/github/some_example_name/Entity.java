@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public abstract class Entity {
     Sprite sprite;
-    private final Rectangle hurtBox = new Rectangle();
+    final Rectangle hurtBox = new Rectangle();
     float moveSpeed;
     Character ch;
     float health;
@@ -44,14 +44,13 @@ public abstract class Entity {
     public void moveTowardsCharacter(){
         Vector2 scl = new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor().scl(moveSpeed);
         moveEachDirectionIfCan(scl);
-        moveEachDirectionIfCan(scl);
     }
 
     public void moveEachDirectionIfCan(Vector2 scl) {
         boolean shouldReturnX = false;
         boolean shouldReturnY = false;
-        sprite.translateX(scl.x);
 
+        sprite.translateX(scl.x);
         for(Entity entity : Main.terrains){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnX = true;

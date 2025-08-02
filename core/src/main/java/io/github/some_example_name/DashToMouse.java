@@ -41,9 +41,7 @@ public class DashToMouse {
 
     public void handleJump() {
         if (jumpTimer.isFlagged()) {
-
-            ch.sprite.translateX(direction.x);
-            ch.sprite.translateY(direction.y);
+            ch.moveEachDirectionIfCan(direction);
             jumpTimer.update();
             if (!jumpTimer.isValid()) {
                 ch.invincible = false;

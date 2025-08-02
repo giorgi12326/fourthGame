@@ -64,8 +64,9 @@ public class Main extends ApplicationAdapter {
 
         for (Entity entity : enemies) {
             entity.update();
-            if(entity.updateHurtBox().overlaps(ch.updateHurtBox()))
+            if(entity.updateHurtBox().overlaps(ch.updateHurtBox())){
                 ch.gotHit();
+            }
         }
 
         for (Projectile projectile : projectiles) {
@@ -252,7 +253,7 @@ public class Main extends ApplicationAdapter {
                 float x = center.x + radius * (float)Math.cos(angle);
                 float y = center.y + radius * (float)Math.sin(angle);
 
-                enemies.add(new Wood(new Vector2(x, y),2f, ch));
+                terrains.add(new Wood(new Vector2(x, y),2f, ch));
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
