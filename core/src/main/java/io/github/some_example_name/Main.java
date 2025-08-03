@@ -21,6 +21,8 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class Main extends ApplicationAdapter {
+    public static boolean onKillResetAttack;
+    public static boolean onKillResetDash;
     private SpriteBatch batch;
     private Character ch;
     public static OrthographicCamera camera;
@@ -99,8 +101,10 @@ public class Main extends ApplicationAdapter {
         ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(),0f));
         ifCircleAttacksExecuteThis(projectiles ,(Entity entity)-> {
             entity.gotHit(new Vector2(),0f);
-            ch.dashToMouse.cooldown.finish();
-            ch.circleAttack.cooldown.finish();
+            if(Main.onKillResetAttack)
+                ch.circleAttack.cooldown.finish();
+            if(Main.onKillResetDash)
+                ch.dashToMouse.cooldown.finish();
             }
         );
 
@@ -251,19 +255,6 @@ public class Main extends ApplicationAdapter {
                 enemies.add(new Blurpy(new Vector2(x, y),2f, ch));
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
-            float radius = 1000;
-            int numEnemies = 6;
-            Vector2 center = new Vector2(ch.centerX(), ch.centerY());
-
-            for (int i = 0; i < numEnemies; i++) {
-                float angle = (float)(2 * Math.PI * i / numEnemies);
-                float x = center.x + radius * (float)Math.cos(angle);
-                float y = center.y + radius * (float)Math.sin(angle);
-
-                terrains.add(new Greeno(new Vector2(x, y),2f, ch));
-            }
-        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
             float radius = 1000;
             int numEnemies = 12;
@@ -279,6 +270,22 @@ public class Main extends ApplicationAdapter {
                 else
                     enemies.add(new Booper(new Vector2(x, y),2f, ch));
             }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            float radius = 1000;
+            int numEnemies = 6;
+            Vector2 center = new Vector2(ch.centerX(), ch.centerY());
+
+            for (int i = 0; i < numEnemies; i++) {
+                float angle = (float)(2 * Math.PI * i / numEnemies);
+                float x = center.x + radius * (float)Math.cos(angle);
+                float y = center.y + radius * (float)Math.sin(angle);
+
+                terrains.add(new Greeno(new Vector2(x, y),2f, ch));
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+            enemies.add(new Zimmer(new Vector2(),2f, ch));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
@@ -307,6 +314,8 @@ public class Main extends ApplicationAdapter {
 
         if (Gdx.input.isKeyPressed(Input.Keys.PLUS)) camera.zoom *= 0.99f;
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom *= 1.01f;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) onKillResetAttack = true;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) onKillResetDash = true;
     }
 
     @Override

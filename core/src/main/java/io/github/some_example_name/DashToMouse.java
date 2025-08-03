@@ -23,8 +23,10 @@ public class DashToMouse {
 
     public void jumpToMouse() {
         if (cooldown.isValid() && !jumpTimer.isFlagged()) {
-            ch.circleAttack.cooldown.finish();
-            ch.dashToMouse.cooldown.finish();
+            if(Main.onKillResetAttack)
+                ch.circleAttack.cooldown.finish();
+            if(Main.onKillResetDash)
+                ch.dashToMouse.cooldown.finish();
             jumpTimer.flag();
             ch.invincible = true;
             cooldown.reset();

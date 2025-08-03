@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class Character extends Entity{
     final DashToMouse dashToMouse;
     CircleAttack circleAttack = new CircleAttack(this);
-    Cooldown hurtCooldown = new Cooldown(0.1f);
+    Cooldown hurtCooldown = new Cooldown(0.3f);
     boolean invincible = false;
     float wood;
 

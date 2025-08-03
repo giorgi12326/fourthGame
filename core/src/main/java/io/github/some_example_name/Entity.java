@@ -37,8 +37,10 @@ public abstract class Entity {
             health -= 10f;
 
             if (health <= 0) {
-                ch.circleAttack.cooldown.finish();
-                ch.dashToMouse.cooldown.finish();
+                if(Main.onKillResetAttack)
+                    ch.circleAttack.cooldown.finish();
+                if(Main.onKillResetDash)
+                    ch.dashToMouse.cooldown.finish();
                 markAsDeleted = true;
             }
         }
