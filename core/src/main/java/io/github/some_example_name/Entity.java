@@ -85,4 +85,12 @@ public abstract class Entity {
          if(shouldReturnY)
             sprite.translateY(-scl.y);
     }
+
+    public float centerX(){
+        return sprite.getX() + sprite.getWidth()/2f;
+    }
+
+    public float centerY(){
+        return sprite.getY() + sprite.getHeight()/2f;
+    }
 }

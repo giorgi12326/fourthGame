@@ -30,6 +30,7 @@ public class Main extends ApplicationAdapter {
     public static List<Entity> enemies;
     public static List<Entity> terrains;
     public static List<Entity> projectiles;
+    public static List<Entity> friendlyProjectiles;
     ShapeRenderer shapeRenderer;
     BitmapFont font;
 
@@ -46,6 +47,7 @@ public class Main extends ApplicationAdapter {
         ch = new Character(300f);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
+        friendlyProjectiles = new ArrayList<>();
         terrains = new ArrayList<>();
 
         random = new Random();
@@ -69,10 +71,12 @@ public class Main extends ApplicationAdapter {
         ch.update();
         updateEntityList(enemies);
         updateEntityList(projectiles);
+        updateEntityList(friendlyProjectiles);
         updateEntityList(terrains);
 
         garbageRemoveList(enemies);
         garbageRemoveList(projectiles);
+        garbageRemoveList(friendlyProjectiles);
         garbageRemoveList(terrains);
 
         for (Entity entity : enemies) {
@@ -107,6 +111,26 @@ public class Main extends ApplicationAdapter {
                 ch.dashToMouse.cooldown.finish();
             }
         );
+        ifCircleAttacksExecuteThis(friendlyProjectiles ,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f));
+
+        for(Entity terrain: terrains) {
+            for (Entity projectile : projectiles) {
+                if (projectile.updateHurtBox().overlaps(terrain.updateHurtBox())) {
+                    projectile.markAsDeleted = true;
+                    terrain.gotHit(new Vector2(),0);
+                }
+            }
+        }
+        for (int i = friendlyProjectiles.size()-1; i >= 0; i--) {
+            Entity projectile = friendlyProjectiles.get(i);
+            for (int j = enemies.size()-1; j >= 0; j--) {
+                Entity enemy = enemies.get(j);
+                if(projectile.updateHurtBox().overlaps(enemy.updateHurtBox())) {
+                    if(projectile instanceof Shell shell && shell.isMoving)
+                        enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()),10f);
+                }
+            }
+        }
 
 
         updateCamera();
@@ -192,9 +216,16 @@ public class Main extends ApplicationAdapter {
         batch.begin();
         drawBackground();
 
-        drawEntityList(enemies);
+        for (Entity entity : enemies) {
+            if(entity instanceof Zimmer zimmer) {
+                  batch.draw(zimmer.animation.getKeyFrame(zimmer.animationTimer.currentTimer), zimmer.centerX() - 128, zimmer.centerY() - 128,
+                    256, 256);
+            }
+            entity.sprite.draw(batch);
+        }
         drawEntityList(terrains);
         drawEntityList(projectiles);
+        drawEntityList(friendlyProjectiles);
 
         if(!ch.markAsDeleted) {
             ch.sprite.draw(batch);
@@ -214,6 +245,7 @@ public class Main extends ApplicationAdapter {
             batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
             batch.begin();
             font.draw(batch, String.valueOf(ch.wood), 30, 120);
+            font.draw(batch, String.valueOf(ch.health), 960, 170);
         }
         batch.end();
     }
@@ -286,6 +318,8 @@ public class Main extends ApplicationAdapter {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
             enemies.add(new Zimmer(new Vector2(),2f, ch));
+        }   if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
+            friendlyProjectiles.add(new Shell(new Vector2(),2f, ch));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);

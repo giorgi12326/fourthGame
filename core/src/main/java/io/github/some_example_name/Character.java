@@ -97,11 +97,5 @@ public class Character extends Entity{
         }
     }
 
-    public float centerX(){
-        return sprite.getX() + sprite.getWidth()/2f;
-    }
 
-    public float centerY(){
-        return sprite.getY() + sprite.getHeight()/2f;
-    }
 }
