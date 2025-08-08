@@ -9,10 +9,10 @@ public class Shell extends Entity{
     public boolean isMoving = false;
     public Shell(Vector2 position, float moveSpeed, Character ch) {
         super(moveSpeed, ch);
-        sprite = new Sprite(new Texture("shell.png"));
+        sprite = new Sprite(new Texture("star.png"));
         sprite.setPosition(position.x, position.y);
         sprite.setOriginCenter();
-        this.moveSpeed = 6f;
+        this.moveSpeed = 10f;
         this.health = 3000f;
     }
 
@@ -44,7 +44,7 @@ public class Shell extends Entity{
 
         if(dot >= 0 && !direction.isZero()) {
             direction = new Vector2();
-            moveSpeed = 6;
+            moveSpeed = 10;
             isMoving = false;
         }
         else{
