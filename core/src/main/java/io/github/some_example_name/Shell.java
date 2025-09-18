@@ -16,8 +16,8 @@ public class Shell extends Entity{
         sprite = new Sprite(new Texture("star.png"));
         sprite.setPosition(position.x, position.y);
         sprite.setOriginCenter();
-        this.moveSpeed = 10f;
-        this.health = 3000f;
+        this.moveSpeed = 5f;
+        this.health = 3000000f;
 
     }
 
@@ -54,12 +54,12 @@ public class Shell extends Entity{
 
         if(dot >= 0 && !direction.isZero()) {
             direction = new Vector2();
-            moveSpeed = 10;
+            moveSpeed = 5;
             isMoving = false;
         }
         else{
             direction = new Vector2(centerX() - vector2.x, centerY() - vector2.y).nor().scl(moveSpeed);
-            moveSpeed += 6;
+            moveSpeed += 12;
             isMoving = true;
         }
 

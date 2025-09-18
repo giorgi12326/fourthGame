@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Character extends Entity{
     final DashToMouse dashToMouse;
+    public int shells;
     CircleAttack circleAttack = new CircleAttack(this);
     Cooldown hurtCooldown = new Cooldown(0.3f);
     boolean invincible = false;
@@ -18,6 +19,7 @@ public class Character extends Entity{
         sprite.setOriginCenter();
         dashToMouse = new DashToMouse(this);
         health = 100f;
+        shells = 3;
     }
 
     public void update() {

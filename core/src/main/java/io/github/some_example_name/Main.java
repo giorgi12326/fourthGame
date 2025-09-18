@@ -141,7 +141,7 @@ public class Main extends ApplicationAdapter {
                 if(projectile.updateHurtBox().overlaps(enemy.updateHurtBox())) {
                     if(projectile instanceof Shell shell && shell.isMoving) {
                         enemy.gotHit(new Vector2(ch.centerX(), ch.centerY()), 10f);
-                        if(shell.moveSpeed > 16f) {
+                        if(shell.moveSpeed > 17f) {
                             shell.markAsDeleted = true;
                             friendlyProjectiles.add(new Explosion(0,ch, new Vector2(shell.centerX(), shell.centerY())));
                         }
@@ -149,7 +149,6 @@ public class Main extends ApplicationAdapter {
                 }
             }
         }
-
 
         updateCamera();
 
@@ -272,6 +271,8 @@ public class Main extends ApplicationAdapter {
             batch.begin();
             font.draw(batch, String.valueOf(ch.wood), 30, 120);
             font.draw(batch, String.valueOf(ch.health), 960, 170);
+            font.draw(batch, "Shells " + ch.shells, 100, 120);
+
         }
         batch.end();
     }
@@ -346,8 +347,17 @@ public class Main extends ApplicationAdapter {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
             enemies.add(new Zimmer(new Vector2(),2f, ch));
-        }   if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
-            friendlyProjectiles.add(new Shell(new Vector2(),2f, ch));
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+            if(ch.shells > 0) {
+                ch.shells--;
+                float x = Main.random.nextFloat(800);
+                float y = Main.random.nextFloat(800);
+                x -= 400;
+                y -= 400;
+
+                friendlyProjectiles.add(new Shell(new Vector2(ch.centerX() + x, ch.centerY() + y), 2f, ch));
+            }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);
         if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
@@ -369,7 +379,6 @@ public class Main extends ApplicationAdapter {
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) terrains.add(new Greeno(new Vector2(), 0f,ch));
-        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) enemies.add(new Booper(new Vector2(),10f, ch));
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             ch.circleAttack.activate();
         }

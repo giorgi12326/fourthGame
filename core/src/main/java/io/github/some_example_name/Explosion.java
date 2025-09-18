@@ -23,6 +23,7 @@ public class Explosion extends Entity {
         TextureRegion[] walkFrames = new TextureRegion[5];
         System.arraycopy(tmp[0], 0, walkFrames, 0, 5);
         animation = new Animation<>(0.2f, walkFrames);
+        health = 1000f;
 
         animationTimer.flag();
     }
