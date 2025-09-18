@@ -101,6 +101,15 @@ public class Main extends ApplicationAdapter {
             }
         }
 
+        for(Entity friendlyProjectile: friendlyProjectiles) {
+            for (Entity enemy : enemies) {
+                if (friendlyProjectile instanceof Explosion ex && enemy.updateHurtBox().overlaps(ex.updateHurtBox())) {
+                    enemy.markAsDeleted = true;
+                    enemy.gotHit(new Vector2(),0);
+                }
+            }
+        }
+
         ifCircleAttacksExecuteThis(enemies,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f));
         ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(),0f));
         ifCircleAttacksExecuteThis(projectiles ,(Entity entity)-> {
@@ -111,7 +120,11 @@ public class Main extends ApplicationAdapter {
                 ch.dashToMouse.cooldown.finish();
             }
         );
-        ifCircleAttacksExecuteThis(friendlyProjectiles ,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f));
+        ifCircleAttacksExecuteThis(friendlyProjectiles ,(Entity entity)->{
+            entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f);
+            ch.dashToMouse.cooldown.finish();
+            ch.circleAttack.cooldown.finish();
+        });
 
         for(Entity terrain: terrains) {
             for (Entity projectile : projectiles) {
@@ -126,8 +139,13 @@ public class Main extends ApplicationAdapter {
             for (int j = enemies.size()-1; j >= 0; j--) {
                 Entity enemy = enemies.get(j);
                 if(projectile.updateHurtBox().overlaps(enemy.updateHurtBox())) {
-                    if(projectile instanceof Shell shell && shell.isMoving)
-                        enemy.gotHit(new Vector2(ch.centerX(),ch.centerY()),10f);
+                    if(projectile instanceof Shell shell && shell.isMoving) {
+                        enemy.gotHit(new Vector2(ch.centerX(), ch.centerY()), 10f);
+                        if(shell.moveSpeed > 16f) {
+                            shell.markAsDeleted = true;
+                            friendlyProjectiles.add(new Explosion(0,ch, new Vector2(shell.centerX(), shell.centerY())));
+                        }
+                    }
                 }
             }
         }
@@ -223,6 +241,14 @@ public class Main extends ApplicationAdapter {
             }
             entity.sprite.draw(batch);
         }
+        for (Entity entity : friendlyProjectiles) {
+            if(entity instanceof Explosion ex) {
+                batch.draw(ex.animation.getKeyFrame(ex.animationTimer.currentTimer), ex.centerX() - 128, ex.centerY() - 128,
+                    256, 256);
+            }
+            entity.sprite.draw(batch);
+        }
+
         drawEntityList(terrains);
         drawEntityList(projectiles);
         drawEntityList(friendlyProjectiles);
@@ -250,8 +276,10 @@ public class Main extends ApplicationAdapter {
         batch.end();
     }
 
-    private void drawEntityList(List<Entity> enemies) {
-        for (Entity entity : enemies) {
+    private void drawEntityList(List<Entity> entities) {
+        for (Entity entity : entities) {
+            if(entity instanceof Explosion) continue;
+
             entity.sprite.draw(batch);
         }
     }

@@ -34,4 +34,15 @@ public class Timer {
     public void reset() {
         currentTimer = 0f;
     }
+
+    public void handleUpdateAndUnFlagging() {
+        if(isFlagged()) {
+            update();
+            if(!isValid()) {
+                reset();
+                unflag();
+            }
+        }
+    }
+
 }

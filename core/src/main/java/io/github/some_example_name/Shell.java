@@ -1,12 +1,16 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 public class Shell extends Entity{
+
     Vector2 direction = new Vector2();
     public boolean isMoving = false;
+
     public Shell(Vector2 position, float moveSpeed, Character ch) {
         super(moveSpeed, ch);
         sprite = new Sprite(new Texture("star.png"));
@@ -14,6 +18,12 @@ public class Shell extends Entity{
         sprite.setOriginCenter();
         this.moveSpeed = 10f;
         this.health = 3000f;
+
+    }
+
+    @Override
+    public void update() {
+        super.update();
     }
 
     @Override
