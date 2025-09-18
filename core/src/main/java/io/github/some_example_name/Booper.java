@@ -13,8 +13,8 @@ public class Booper extends Entity {
 
     public Booper(Vector2 position, float moveSpeed, Character ch) {
         super(moveSpeed, ch);
-        rotationDirection = Main.random.nextInt(2);
-        rotationDistance = Main.random.nextInt(200) + 300;
+        rotationDirection = GameScreen.random.nextInt(2);
+        rotationDistance = GameScreen.random.nextInt(200) + 300;
 
         sprite = new Sprite(new Texture("booper.png"));
         sprite.setPosition(position.x,position.y);
@@ -55,7 +55,7 @@ public class Booper extends Entity {
 
     private void shoot() {
         if(!attackSpeed.isFlagged()){
-            Main.projectiles.add(new Projectile(new Vector2(sprite.getX(), sprite.getY()), new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor(), ch));
+            GameScreen.projectiles.add(new Projectile(new Vector2(sprite.getX(), sprite.getY()), new Vector2(ch.centerX() - sprite.getX(), ch.centerY() - sprite.getY()).nor(), ch));
             attackSpeed.flag();
         }
     }

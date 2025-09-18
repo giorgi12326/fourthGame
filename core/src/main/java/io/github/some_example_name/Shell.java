@@ -1,9 +1,7 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 public class Shell extends Entity{
@@ -37,9 +35,9 @@ public class Shell extends Entity{
 
             knockback(vector2, impact);
 
-            if(Main.onKillResetAttack)
+            if(GameScreen.onKillResetAttack)
                 ch.circleAttack.cooldown.finish();
-            if(Main.onKillResetDash)
+            if(GameScreen.onKillResetDash)
                 ch.dashToMouse.cooldown.finish();
         }
     }

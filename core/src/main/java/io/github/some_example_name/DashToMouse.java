@@ -23,14 +23,14 @@ public class DashToMouse {
 
     public void jumpToMouse() {
         if (cooldown.isValid() && !jumpTimer.isFlagged()) {
-            if(Main.onKillResetAttack)
+            if(GameScreen.onKillResetAttack)
                 ch.circleAttack.cooldown.finish();
-            if(Main.onKillResetDash)
+            if(GameScreen.onKillResetDash)
                 ch.dashToMouse.cooldown.finish();
             jumpTimer.flag();
             ch.invincible = true;
             cooldown.reset();
-            Vector3 project = Main.camera.project(new Vector3(centerX(), centerY(), 0));
+            Vector3 project = GameScreen.camera.project(new Vector3(centerX(), centerY(), 0));
 
             float mouseX = Gdx.input.getX() - project.x;
             float mouseY = 1080 - project.y - Gdx.input.getY();
@@ -48,7 +48,7 @@ public class DashToMouse {
             boolean shouldReturnX = false;
 
             ch.sprite.translateX(direction.x);
-            for(Entity entity : Main.terrains){
+            for(Entity entity : GameScreen.terrains){
                 if(entity != ch && entity.updateHurtBox().overlaps(ch.updateHurtBox()))
                     shouldReturnX = true;
             }
@@ -59,7 +59,7 @@ public class DashToMouse {
             boolean shouldReturnY = false;
 
             ch.sprite.translateY(direction.y);
-            for(Entity entity : Main.terrains){
+            for(Entity entity : GameScreen.terrains){
                 if(entity != ch && entity.updateHurtBox().overlaps(ch.updateHurtBox()))
                     shouldReturnY = true;
             }

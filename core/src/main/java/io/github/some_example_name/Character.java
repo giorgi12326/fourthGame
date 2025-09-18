@@ -2,7 +2,6 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
 
 public class Character extends Entity{
     final DashToMouse dashToMouse;
@@ -44,7 +43,7 @@ public class Character extends Entity{
 
             sprite.translateX(moveSpeed*delta);
 
-            for(Entity entity : Main.terrains){
+            for(Entity entity : GameScreen.terrains){
                 if( entity.updateHurtBox().overlaps(updateHurtBox()))
                     shouldReturnX = true;
             }
@@ -59,7 +58,7 @@ public class Character extends Entity{
 
             sprite.translateX(-moveSpeed*delta);
 
-            for(Entity entity : Main.terrains){
+            for(Entity entity : GameScreen.terrains){
                 if( entity.updateHurtBox().overlaps(updateHurtBox()))
                     shouldReturnX = true;
             }
@@ -74,7 +73,7 @@ public class Character extends Entity{
 
             sprite.translateY(moveSpeed*delta);
 
-            for(Entity entity : Main.terrains){
+            for(Entity entity : GameScreen.terrains){
                 if( entity.updateHurtBox().overlaps(updateHurtBox()))
                     shouldReturnY = true;
             }
@@ -90,7 +89,7 @@ public class Character extends Entity{
 
             sprite.translateY(-moveSpeed*delta);
 
-            for(Entity entity : Main.terrains){
+            for(Entity entity : GameScreen.terrains){
                 if( entity.updateHurtBox().overlaps(updateHurtBox()))
                     shouldReturnY = true;
             }

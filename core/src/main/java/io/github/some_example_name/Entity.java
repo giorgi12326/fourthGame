@@ -37,9 +37,9 @@ public abstract class Entity {
             health -= 10f;
 
             if (health <= 0) {
-                if(Main.onKillResetAttack)
+                if(GameScreen.onKillResetAttack)
                     ch.circleAttack.cooldown.finish();
-                if(Main.onKillResetDash)
+                if(GameScreen.onKillResetDash)
                     ch.dashToMouse.cooldown.finish();
                 markAsDeleted = true;
             }
@@ -60,11 +60,11 @@ public abstract class Entity {
         boolean shouldReturnX = false;
 
         sprite.translateX(scl.x);
-        for(Entity entity : Main.terrains){
+        for(Entity entity : GameScreen.terrains){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnX = true;
         }
-        for(Entity entity :  Main.enemies){
+        for(Entity entity :  GameScreen.enemies){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnX = true;
         }
@@ -74,11 +74,11 @@ public abstract class Entity {
         boolean shouldReturnY = false;
 
         sprite.translateY(scl.y);
-        for(Entity entity : Main.terrains){
+        for(Entity entity : GameScreen.terrains){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnY = true;
         }
-        for(Entity entity : Main.enemies){
+        for(Entity entity : GameScreen.enemies){
             if(entity != this && entity.updateHurtBox().overlaps(updateHurtBox()))
                 shouldReturnY = true;
         }
