@@ -36,7 +36,7 @@ public class DashToMouse {
             Vector3 project = GameScreen.camera.project(new Vector3(centerX(), centerY(), 0));
 
             float mouseX = Gdx.input.getX() - project.x;
-            float mouseY = 1080 - project.y - Gdx.input.getY();
+            float mouseY = Gdx.graphics.getHeight() - project.y - Gdx.input.getY();
 
             direction = new Vector2(mouseX, mouseY);
             direction.nor();

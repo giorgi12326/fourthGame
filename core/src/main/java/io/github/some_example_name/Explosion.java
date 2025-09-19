@@ -1,17 +1,19 @@
 package io.github.some_example_name;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Explosion extends Entity {
     Animation<TextureRegion> animation;
     Timer animationTimer = new Timer(0.5f);
     Circle hurtBox = new Circle();
+    Sound music = Gdx.audio.newSound(Gdx.files.internal("bomb.mp3"));
 
     public Explosion(float moveSpeed, Character ch, Vector2 position) {
         super(moveSpeed, ch);
@@ -28,6 +30,8 @@ public class Explosion extends Entity {
         health = 1000f;
 
         animationTimer.flag();
+
+        music.play();
     }
 
 
