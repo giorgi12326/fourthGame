@@ -22,7 +22,7 @@ public class Character extends Entity{
         sprite.setOriginCenter();
         dashToMouse = new DashToMouse(this);
         health = 100f;
-        shells = 3;
+        shells = 50;
     }
 
     public void update() {

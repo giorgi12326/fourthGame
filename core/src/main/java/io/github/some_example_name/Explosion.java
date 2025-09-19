@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Explosion extends Entity {
     Animation<TextureRegion> animation;
-    Timer animationTimer = new Timer(1f);
+    Timer animationTimer = new Timer(0.5f);
     Circle hurtBox = new Circle();
 
     public Explosion(float moveSpeed, Character ch, Vector2 position) {
@@ -19,10 +19,12 @@ public class Explosion extends Entity {
         sprite.setOriginCenter();
         sprite.setPosition(position.x, position.y);
 
-        TextureRegion[][] tmp = TextureRegion.split(new Texture("zimmer_attack.png"), 256, 256);
+
+        TextureRegion[][] tmp = TextureRegion.split(new Texture("explode.png"),150,60);
+
         TextureRegion[] walkFrames = new TextureRegion[5];
         System.arraycopy(tmp[0], 0, walkFrames, 0, 5);
-        animation = new Animation<>(0.2f, walkFrames);
+        animation = new Animation<>(0.1f, walkFrames);
         health = 1000f;
 
         animationTimer.flag();

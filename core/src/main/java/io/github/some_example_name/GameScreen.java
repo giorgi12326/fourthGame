@@ -73,7 +73,7 @@ public class GameScreen implements Screen {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("kirby song.mp3"));
         music.setLooping(true);
-        music.play();
+//        music.play();
 
     }
 
@@ -124,29 +124,29 @@ public class GameScreen implements Screen {
             for (Entity projectile : projectiles) {
                 if (projectile.updateHurtBox().overlaps(terrain.updateHurtBox())) {
                     projectile.markAsDeleted = true;
-                    terrain.gotHit(new Vector2(),0);
+                    terrain.gotHit(new Vector2(),0, 10);
                 }
             }
         }
 
         for(Entity friendlyProjectile: friendlyProjectiles) {
-            System.out.println(friendlyProjectiles.size());
             for (Entity enemy : enemies) {
-                if (friendlyProjectile instanceof Explosion ex && enemy.updateHurtBox().overlaps(ex.updateHurtBox())) {
-                    enemy.markAsDeleted = true;
-                    enemy.gotHit(new Vector2(),0);
+                if (friendlyProjectile instanceof Explosion ex && Intersector.overlaps(ex.updateHurtBoxCircle(), enemy.updateHurtBox())) {
+                    enemy.gotHit(new Vector2(),0, 10);
                 }
-                 if (enemy.updateHurtBox().overlaps(friendlyProjectile.updateHurtBox())) {
-                    enemy.gotHit(new Vector2(),0);
+                else if (friendlyProjectile instanceof Projectile && enemy.updateHurtBox().overlaps(friendlyProjectile.updateHurtBox())) {
+                    enemy.gotHit(new Vector2(),0, 10f);
                     friendlyProjectile.markAsDeleted = true;
                 }
+
+
             }
         }
 
-        ifCircleAttacksExecuteThis(enemies,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f));
-        ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(),0f));
+        ifCircleAttacksExecuteThis(enemies,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f, 10f));
+        ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(), 0f,10f));
         ifCircleAttacksExecuteThis(projectiles ,(Entity entity)-> {
-            entity.gotHit(new Vector2(),0f);
+            entity.gotHit(new Vector2(),0f, 10f);
             if(GameScreen.onKillResetAttack)
                 ch.circleAttack.cooldown.finish();
             if(GameScreen.onKillResetDash)
@@ -154,7 +154,7 @@ public class GameScreen implements Screen {
             }
         );
         ifCircleAttacksExecuteThis(friendlyProjectiles ,(Entity entity)->{
-            entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f);
+            entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f, 10f);
             ch.dashToMouse.cooldown.finish();
             ch.circleAttack.cooldown.finish();
         });
@@ -163,7 +163,7 @@ public class GameScreen implements Screen {
             for (Entity projectile : projectiles) {
                 if (projectile.updateHurtBox().overlaps(terrain.updateHurtBox())) {
                     projectile.markAsDeleted = true;
-                    terrain.gotHit(new Vector2(),0);
+                    terrain.gotHit(new Vector2(),0, 10f);
                 }
             }
         }
@@ -173,7 +173,7 @@ public class GameScreen implements Screen {
                 Entity enemy = enemies.get(j);
                 if(projectile.updateHurtBox().overlaps(enemy.updateHurtBox())) {
                     if(projectile instanceof Shell shell && shell.isMoving) {
-                        enemy.gotHit(new Vector2(ch.centerX(), ch.centerY()), 10f);
+                        enemy.gotHit(new Vector2(ch.centerX(), ch.centerY()), 10f, 2f);
                         if(shell.moveSpeed > 17f) {
                             shell.markAsDeleted = true;
                             friendlyProjectiles.add(new Explosion(0,ch, new Vector2(shell.centerX(), shell.centerY())));
@@ -189,6 +189,20 @@ public class GameScreen implements Screen {
 
         drawGridLines();
         drawHUD();
+
+//        drawDebugLines();
+    }
+
+    private void drawDebugLines() {
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+        if(!friendlyProjectiles.isEmpty()){
+            Entity entity = friendlyProjectiles.get(0);
+
+            shapeRenderer.circle(entity.centerX() , entity.centerY(), 150);
+        }
+        shapeRenderer.end();
     }
 
     private void drawHUD() {
@@ -276,10 +290,11 @@ public class GameScreen implements Screen {
         }
         for (Entity entity : friendlyProjectiles) {
             if(entity instanceof Explosion ex) {
-                batch.draw(ex.animation.getKeyFrame(ex.animationTimer.currentTimer), ex.centerX() - 128, ex.centerY() - 128,
-                    256, 256);
+                batch.draw(ex.animation.getKeyFrame(ex.animationTimer.currentTimer), ex.centerX() - 450, ex.centerY() - 180,
+                    900, 360);
             }
-            entity.sprite.draw(batch);
+            else
+                entity.sprite.draw(batch);
         }
 
         drawEntityList(terrains);

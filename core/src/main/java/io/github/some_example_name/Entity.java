@@ -29,12 +29,12 @@ public abstract class Entity {
         return hurtBox;
     }
 
-    public void gotHit(Vector2 vector2, float impact) {
+    public void gotHit(Vector2 vector2, float impact, float damage) {
         if(!hurtCooldown.isFlagged()) {
             hurtCooldown.flag();
 
             knockback(vector2, impact);
-            health -= 10f;
+            health -= damage;
 
             if (health <= 0) {
                 if(GameScreen.onKillResetAttack)

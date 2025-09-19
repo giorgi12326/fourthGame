@@ -36,7 +36,7 @@ public class Projectile extends Entity {
     }
 
     @Override
-    public void gotHit(Vector2 vector2, float impact) {
+    public void gotHit(Vector2 vector2, float impact, float damage) {
         if (!hurtCooldown.isFlagged()) {
             hurtCooldown.flag();
             if(parryable){

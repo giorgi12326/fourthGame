@@ -18,10 +18,10 @@ public class Greeno extends Entity{
         hurtCooldown.handleUpdateAndUnFlagging();
     }
 
-    public void gotHit(Vector2 vector2, float impact) {
+    public void gotHit(Vector2 vector2, float impact, float damage) {
         if(!hurtCooldown.isFlagged()) {
             hurtCooldown.flag();
-            health -= 10f;
+            health -= damage;
             ch.wood +=10f;
             if (health <= 0)
                 markAsDeleted = true;
