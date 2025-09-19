@@ -57,7 +57,7 @@ public class CircleAttack {
 
     private void playAttackSound() {
         float pitch = 0.9f + GameScreen.random.nextFloat() * 0.2f;
-        attackSound.play(1.0f, pitch, 0f);
+        attackSound.play(1.0f, pitch + 0.9f, 0f);
     }
 
     public void handleHitbox(){

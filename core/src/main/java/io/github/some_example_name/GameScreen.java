@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -34,13 +36,13 @@ public class GameScreen implements Screen {
     public static List<Entity> friendlyProjectiles;
     ShapeRenderer shapeRenderer;
     BitmapFont font;
+    Music music;
 
     private static final float CAMERA_ZOOM = 0.75f;
     private static final float CAMERA_SPEED = 0.1f;
     public static Random random;
     private boolean gridActive;
     public Main main;
-    private boolean paused = false;
 
     public GameScreen(Main main) {
         this.main = main;
@@ -68,17 +70,23 @@ public class GameScreen implements Screen {
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         shapeRenderer = new ShapeRenderer();
+
+        music = Gdx.audio.newMusic(Gdx.files.internal("kirby song.mp3"));
+        music.setLooping(true);
+        music.play();
+
     }
 
     @Override
     public void render(float delta) {
-        if(paused)
-            return;
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
         draw();
-        if(ch.markAsDeleted) main.setScreen(new DeathScreen(main));
+        if(ch.markAsDeleted) {
+            music.stop();
+            main.setScreen(new DeathScreen(main));
+        }
         ch.update();
         updateEntityList(enemies);
         updateEntityList(projectiles);
@@ -86,9 +94,17 @@ public class GameScreen implements Screen {
         updateEntityList(terrains);
 
         garbageRemoveList(enemies);
-        garbageRemoveList(projectiles);
         garbageRemoveList(friendlyProjectiles);
         garbageRemoveList(terrains);
+
+
+        for (int i = projectiles.size() - 1; i >= 0; i--) {
+            Entity entity = projectiles.get(i);
+            if (entity.markAsDeleted) {
+                projectiles.remove(entity);
+                entity.cleanUpAfterDeletion();
+            }
+        }
 
         for (Entity entity : enemies) {
             if(entity.updateHurtBox().overlaps(ch.updateHurtBox())){
@@ -100,6 +116,7 @@ public class GameScreen implements Screen {
             if(projectile.updateHurtBox().overlaps(ch.updateHurtBox())){
                 projectile.markAsDeleted = true;
                 ch.gotHit();
+                ch.slimes.add(new Timer(0.7f));
             }
         }
 
@@ -113,10 +130,15 @@ public class GameScreen implements Screen {
         }
 
         for(Entity friendlyProjectile: friendlyProjectiles) {
+            System.out.println(friendlyProjectiles.size());
             for (Entity enemy : enemies) {
                 if (friendlyProjectile instanceof Explosion ex && enemy.updateHurtBox().overlaps(ex.updateHurtBox())) {
                     enemy.markAsDeleted = true;
                     enemy.gotHit(new Vector2(),0);
+                }
+                 if (enemy.updateHurtBox().overlaps(friendlyProjectile.updateHurtBox())) {
+                    enemy.gotHit(new Vector2(),0);
+                    friendlyProjectile.markAsDeleted = true;
                 }
             }
         }
@@ -231,11 +253,12 @@ public class GameScreen implements Screen {
         }
     }
 
-    private static void garbageRemoveList(List<Entity> enemies) {
-        for (int i = enemies.size() - 1; i >= 0; i--) {
-            Entity entity = enemies.get(i);
-            if (entity.markAsDeleted)
-                enemies.remove(entity);
+    private void garbageRemoveList(List<Entity> entities) {
+        for (int i = entities.size() - 1; i >= 0; i--) {
+            Entity entity = entities.get(i);
+            if (entity.markAsDeleted) {
+                entities.remove(entity);
+            }
         }
     }
 
@@ -400,6 +423,8 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) camera.zoom *= 1.01f;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) onKillResetAttack = true;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) onKillResetDash = true;
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) enemies.add(new Booper(new Vector2(),0,ch) );
 
     }
 

@@ -93,4 +93,8 @@ public abstract class Entity {
     public float centerY(){
         return sprite.getY() + sprite.getHeight()/2f;
     }
+
+    public void cleanUpAfterDeletion(){
+
+    }
 }

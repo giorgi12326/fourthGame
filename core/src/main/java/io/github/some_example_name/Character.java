@@ -3,6 +3,9 @@ package io.github.some_example_name;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Character extends Entity{
     final DashToMouse dashToMouse;
     public int shells;
@@ -10,6 +13,7 @@ public class Character extends Entity{
     Cooldown hurtCooldown = new Cooldown(0.3f);
     boolean invincible = false;
     float wood;
+    public List<Timer> slimes = new ArrayList<>();
 
     public Character(float moveSpeed) {
         super(moveSpeed, null);
@@ -25,6 +29,17 @@ public class Character extends Entity{
         dashToMouse.update();
         circleAttack.update();
         hurtCooldown.handleUpdateAndUnFlagging();
+        handleSlimes();
+    }
+
+    private void handleSlimes() {
+        for (int i = slimes.size()-1; i >=0 ; i--) {
+            Timer timer = slimes.get(i);
+            timer.update();
+            if(!timer.isValid())
+                slimes.remove(i);
+            ch.moveSpeed = Math.max(50,200 - slimes.size()*40f);
+        }
     }
 
     public void gotHit(){

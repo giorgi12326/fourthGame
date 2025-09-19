@@ -3,7 +3,7 @@ package io.github.some_example_name;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-    public class Greeno extends Entity{
+public class Greeno extends Entity{
     public Greeno(Vector2 position, float moveSpeed, Character ch) {
         super(moveSpeed, ch);
         sprite = new Sprite(new Texture("greeno.png"));
