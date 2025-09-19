@@ -40,6 +40,7 @@ public class GameScreen implements Screen {
     public static Random random;
     private boolean gridActive;
     public Main main;
+    private boolean paused = false;
 
     public GameScreen(Main main) {
         this.main = main;
@@ -51,7 +52,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         font = new BitmapFont(); // uses default font
 
-        ch = new Character(300f);
+        ch = new Character(200f);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
         friendlyProjectiles = new ArrayList<>();
@@ -71,6 +72,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        if(paused)
+            return;
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
@@ -321,7 +324,7 @@ public class GameScreen implements Screen {
                 float x = center.x + radius * (float)Math.cos(angle);
                 float y = center.y + radius * (float)Math.sin(angle);
 
-                enemies.add(new Blurpy(new Vector2(x, y),2f, ch));
+                enemies.add(new Blurpy(new Vector2(x, y),1f, ch));
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
@@ -386,20 +389,19 @@ public class GameScreen implements Screen {
                 terrains.add(new Block(new Vector2(snappedX, snappedY), 10f, ch));
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) terrains.add(new Greeno(new Vector2(), 0f,ch));
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             ch.circleAttack.activate();
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            main.setScreen(new MenuScreen(main));
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.PLUS)) camera.zoom *= 0.99f;
-        if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom *= 1.01f;
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT_BRACKET)) camera.zoom *= 0.99f;
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT_BRACKET)) camera.zoom *= 1.01f;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) onKillResetAttack = true;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) onKillResetDash = true;
+
     }
-
-
-
-
 
     @Override
     public void resize(int width, int height) {

@@ -1,6 +1,7 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -18,6 +19,7 @@ public class CircleAttack {
     Timer animationTimer = new Timer(0.1f);
     float rotation = 0f;
     boolean clockwise = true;
+    Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("attack_swoosh.mp3"));
 
     public CircleAttack(Character ch){
         this.ch = ch;
@@ -47,9 +49,15 @@ public class CircleAttack {
     public void activate(){
         if(cooldown.isValid() && !durationTimer.isFlagged()) {
             durationTimer.flag();
+            playAttackSound();
             clockwise = !clockwise;
             cooldown.reset();
         }
+    }
+
+    private void playAttackSound() {
+        float pitch = 0.9f + GameScreen.random.nextFloat() * 0.2f;
+        attackSound.play(1.0f, pitch, 0f);
     }
 
     public void handleHitbox(){
