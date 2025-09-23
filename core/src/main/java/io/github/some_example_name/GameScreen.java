@@ -79,27 +79,25 @@ public class GameScreen implements Screen {
         music.setLooping(true);
         music.play();
 
-//        new Thread(() -> {
-//            try {
-//                Socket socket = new Socket("localhost", 9999);
-//                out = new ObjectOutputStream(socket.getOutputStream());
-//                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-//
-//                // Loop to listen for server messages
-//                while (true) {
-//                    Object obj = in.readObject();
-//                    if ("ACK".equals(obj)) {
-//                        Gdx.app.postRunnable(() -> {
-//                            flip = true;
-//                            System.out.println("Flip set to true");
-//                            flip = false;
-//                        });
-//                    }
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
+        new Thread(() -> {
+            try {
+                Socket socket = new Socket("localhost", 9999);
+                out = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+
+                // Loop to listen for server messages
+                while (true) {
+                    Object obj = in.readObject();
+                    if ("ACK".equals(obj)) {
+                        Gdx.app.postRunnable(() -> {
+                            ch.circleAttack.activate();
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @Override
@@ -166,16 +164,16 @@ public class GameScreen implements Screen {
             }
         }
 
-        ifCircleAttacksExecuteThis(enemies,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f, 10f));
-        ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(), 0f,10f));
-        ifCircleAttacksExecuteThis(projectiles ,(Entity entity)-> {
-            entity.gotHit(new Vector2(),0f, 10f);
-            if(GameScreen.onKillResetAttack)
-                ch.circleAttack.cooldown.finish();
-            if(GameScreen.onKillResetDash)
-                ch.dashToMouse.cooldown.finish();
-            }
-        );
+//        ifCircleAttacksExecuteThis(enemies,(Entity entity)-> entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f, 10f));
+//        ifCircleAttacksExecuteThis(terrains, (Entity entity)-> entity.gotHit(new Vector2(), 0f,10f));
+//        ifCircleAttacksExecuteThis(projectiles ,(Entity entity)-> {
+//            entity.gotHit(new Vector2(),0f, 10f);
+//            if(GameScreen.onKillResetAttack)
+//                ch.circleAttack.cooldown.finish();
+//            if(GameScreen.onKillResetDash)
+//                ch.dashToMouse.cooldown.finish();
+//            }
+//        );
         ifCircleAttacksExecuteThis(friendlyProjectiles ,(Entity entity)->{
             entity.gotHit(new Vector2(ch.centerX(),ch.centerY()),30f, 10f);
             ch.dashToMouse.cooldown.finish();
@@ -454,13 +452,12 @@ public class GameScreen implements Screen {
             }
         }
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-            ch.circleAttack.activate();
-//            try {
-//                out.writeObject("ad");
-//                out.flush();
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
+            try {
+                out.writeObject("left-click");
+                out.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.setScreen(new MenuScreen(main));
