@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class DashToMouse {
     private final Character ch;
-    float jumpDistance = 30f;
+    float jumpDistance = 17f;
     Vector2 direction;
     Sound jumpSound = Gdx.audio.newSound(Gdx.files.internal("jumpSound.mp3"));
 

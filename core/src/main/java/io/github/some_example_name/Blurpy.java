@@ -22,11 +22,11 @@ public class Blurpy extends Entity {
     public void update() {
         super.update();
         if(markAsDeleted)
-            playAttackSound();
+            playHurtSound();
 
     }
 
-    private void playAttackSound() {
+    private void playHurtSound() {
         float pitch = 0.9f + GameScreen.random.nextFloat() * 0.2f;
         hurtSound.play(0.6f, pitch, 0f);
     }

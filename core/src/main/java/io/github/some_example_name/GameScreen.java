@@ -18,6 +18,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,12 +39,14 @@ public class GameScreen implements Screen {
     ShapeRenderer shapeRenderer;
     BitmapFont font;
     Music music;
+    boolean flip = false;
 
     private static final float CAMERA_ZOOM = 0.75f;
     private static final float CAMERA_SPEED = 0.1f;
     public static Random random;
     private boolean gridActive;
     public Main main;
+    private ObjectOutputStream out;
 
     public GameScreen(Main main) {
         this.main = main;
@@ -73,8 +77,29 @@ public class GameScreen implements Screen {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("kirby song.mp3"));
         music.setLooping(true);
-//        music.play();
+        music.play();
 
+//        new Thread(() -> {
+//            try {
+//                Socket socket = new Socket("localhost", 9999);
+//                out = new ObjectOutputStream(socket.getOutputStream());
+//                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+//
+//                // Loop to listen for server messages
+//                while (true) {
+//                    Object obj = in.readObject();
+//                    if ("ACK".equals(obj)) {
+//                        Gdx.app.postRunnable(() -> {
+//                            flip = true;
+//                            System.out.println("Flip set to true");
+//                            flip = false;
+//                        });
+//                    }
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
     }
 
     @Override
@@ -138,8 +163,6 @@ public class GameScreen implements Screen {
                     enemy.gotHit(new Vector2(),0, 10f);
                     friendlyProjectile.markAsDeleted = true;
                 }
-
-
             }
         }
 
@@ -215,6 +238,9 @@ public class GameScreen implements Screen {
 
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(400, 100, 11.2f * ch.health, 50);
+        if(flip)
+            shapeRenderer.rect(400, 300, 50, 50);
+
 
 
         shapeRenderer.end();
@@ -286,7 +312,7 @@ public class GameScreen implements Screen {
                   batch.draw(zimmer.animation.getKeyFrame(zimmer.animationTimer.currentTimer), zimmer.centerX() - 128, zimmer.centerY() - 128,
                     256, 256);
             }
-            entity.sprite.draw(batch);
+            entity.draw(batch);
         }
         for (Entity entity : friendlyProjectiles) {
             if(entity instanceof Explosion ex) {
@@ -427,8 +453,14 @@ public class GameScreen implements Screen {
                 terrains.add(new Block(new Vector2(snappedX, snappedY), 10f, ch));
             }
         }
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
             ch.circleAttack.activate();
+//            try {
+//                out.writeObject("ad");
+//                out.flush();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.setScreen(new MenuScreen(main));
@@ -439,7 +471,8 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) onKillResetAttack = true;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) onKillResetDash = true;
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) enemies.add(new Booper(new Vector2(),0,ch) );
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) enemies.add(new Bose(3f,ch) );
+
 
     }
 

@@ -1,6 +1,7 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,12 +13,14 @@ public abstract class Entity {
     Character ch;
     float health;
     Cooldown hurtCooldown = new Cooldown(0.1f);
+    Timer stunCooldown = new Timer(0.2f);
 
     public boolean markAsDeleted;
 
     public Entity(float moveSpeed, Character ch) {
         this.ch = ch;
         this.moveSpeed = moveSpeed;
+
     }
     public void update(){
         moveTowardsCharacter();
@@ -34,8 +37,8 @@ public abstract class Entity {
             hurtCooldown.flag();
 
             knockback(vector2, impact);
+            stunCooldown.flag();
             health -= damage;
-
             if (health <= 0) {
                 if(GameScreen.onKillResetAttack)
                     ch.circleAttack.cooldown.finish();
@@ -96,5 +99,9 @@ public abstract class Entity {
 
     public void cleanUpAfterDeletion(){
 
+    }
+
+    public void draw(SpriteBatch batch) {
+        sprite.draw(batch);
     }
 }

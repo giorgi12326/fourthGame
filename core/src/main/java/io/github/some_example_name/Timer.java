@@ -45,4 +45,16 @@ public class Timer {
         }
     }
 
+    public void handleUpdateAndUnFlagging(Runnable start, Runnable stop) {
+        if(isFlagged()) {
+            update();
+            start.run();
+            if(!isValid()) {
+                stop.run();
+                reset();
+                unflag();
+            }
+        }
+    }
+
 }
