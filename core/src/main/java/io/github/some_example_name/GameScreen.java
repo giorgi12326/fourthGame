@@ -1,11 +1,9 @@
 package io.github.some_example_name;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,6 +20,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -77,22 +76,52 @@ public class GameScreen implements Screen {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("kirby song.mp3"));
         music.setLooping(true);
-        music.play();
+//        music.play();
 
         new Thread(() -> {
             try {
                 Socket socket = new Socket("localhost", 9999);
                 out = new ObjectOutputStream(socket.getOutputStream());
+                System.out.println("out created!");
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-                // Loop to listen for server messages
                 while (true) {
-                    Object obj = in.readObject();
-                    if ("ACK".equals(obj)) {
+                    Message mes = (Message) in.readObject();
+                    if ("left-click-ACK".equals(mes.title)) {
                         Gdx.app.postRunnable(() -> {
                             ch.circleAttack.activate();
                         });
                     }
+                    if ("ch-pos".equals(mes.title)) {
+                        Gdx.app.postRunnable(() -> {
+                            float[] payload = (float[]) mes.payload;
+                            ch.sprite.setCenter(payload[0], payload[1]);
+                        });
+                    }
+                    if ("entity-create-ACK".equals(mes.title)) {
+                        EntityDTO payload = (EntityDTO) mes.payload;
+                        Gdx.app.postRunnable(() -> {
+                            Blurpy e = new Blurpy(payload.position, 1f, ch, payload.id);
+                            enemies.add(e);
+
+                        });
+                    }
+                    if ("entity-update".equals(mes.title)) {
+                        EntityDTO payload = (EntityDTO) mes.payload;
+
+                        Gdx.app.postRunnable(() -> {
+                            Optional<Entity> first = enemies.stream().filter(e-> e.id == payload.id).findFirst();
+                            first.ifPresent(e -> e.sprite.setCenter(payload.position.x, payload.position.y));
+                        });
+                    }
+                    if ("entity-delete".equals(mes.title)) {
+                        EntityDTO payload = (EntityDTO) mes.payload;
+                        Gdx.app.postRunnable(() -> {
+                            Optional<Entity> first = enemies.stream().filter(e-> e.id == payload.id).findFirst();
+                            first.ifPresent(e -> enemies.remove(e));
+                        });
+                    }
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -111,7 +140,7 @@ public class GameScreen implements Screen {
             main.setScreen(new DeathScreen(main));
         }
         ch.update();
-        updateEntityList(enemies);
+//        updateEntityList(enemies);
         updateEntityList(projectiles);
         updateEntityList(friendlyProjectiles);
         updateEntityList(terrains);
@@ -206,7 +235,11 @@ public class GameScreen implements Screen {
 
         updateCamera();
 
-        handleInput();
+        try {
+            handleInput();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         drawGridLines();
         drawHUD();
@@ -236,10 +269,9 @@ public class GameScreen implements Screen {
 
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(400, 100, 11.2f * ch.health, 50);
+
         if(flip)
             shapeRenderer.rect(400, 300, 50, 50);
-
-
 
         shapeRenderer.end();
     }
@@ -373,21 +405,16 @@ public class GameScreen implements Screen {
 
     }
 
-    private void handleInput() {
+    private void handleInput() throws IOException {
         float delta = Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) ch.dashToMouse.jumpToMouse();
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+            out.writeObject(new Message("SPACE", new float[]{Gdx.input.getX(), Gdx.input.getY()}));
+            ch.dashToMouse.jumpToMouse();
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            float radius = 1000;
-            int numEnemies = 12;
-            Vector2 center = new Vector2(ch.centerX(), ch.centerY());
 
-            for (int i = 0; i < numEnemies; i++) {
-                float angle = (float)(2 * Math.PI * i / numEnemies);
-                float x = center.x + radius * (float)Math.cos(angle);
-                float y = center.y + radius * (float)Math.sin(angle);
+            out.writeObject(new Message("NUM-1", null));
 
-                enemies.add(new Blurpy(new Vector2(x, y),1f, ch));
-            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
             float radius = 1000;
@@ -432,10 +459,10 @@ public class GameScreen implements Screen {
                 friendlyProjectiles.add(new Shell(new Vector2(ch.centerX() + x, ch.centerY() + y), 2f, ch));
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) ch.moveUp(delta);
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) ch.moveDown(delta);
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) ch.moveLeft(delta);
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) ch.moveRight(delta);
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) out.writeObject(new Message("W",null));
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) out.writeObject(new Message("S",null));
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) out.writeObject(new Message("A",null));
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) out.writeObject(new Message("D",null));
         if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
             gridActive = !gridActive;
         }
@@ -453,8 +480,7 @@ public class GameScreen implements Screen {
         }
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
             try {
-                out.writeObject("left-click");
-                out.flush();
+                out.writeObject(new Message("left-click", null));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -469,7 +495,14 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) onKillResetDash = true;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) enemies.add(new Bose(3f,ch) );
-
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
+            try {
+                out.writeObject(new Message("entity-create", null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+//        out.flush();
 
     }
 

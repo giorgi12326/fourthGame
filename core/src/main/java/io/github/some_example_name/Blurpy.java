@@ -18,6 +18,15 @@ public class Blurpy extends Entity {
         this.health = 30f;
     }
 
+    public Blurpy(Vector2 position, float moveSpeed, Character ch, int ID) {
+        super(moveSpeed, ch, ID);
+        sprite = new Sprite(new Texture("chara.png"));
+        sprite.setPosition(position.x, position.y);
+        sprite.setOriginCenter();
+        this.moveSpeed = 4f;
+        this.health = 30f;
+    }
+
     @Override
     public void update() {
         super.update();

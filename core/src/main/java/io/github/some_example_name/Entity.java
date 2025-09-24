@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 
 public abstract class Entity {
+    public int id;
     Sprite sprite;
     final Rectangle hurtBox = new Rectangle();
     float moveSpeed;
@@ -22,6 +23,13 @@ public abstract class Entity {
         this.moveSpeed = moveSpeed;
 
     }
+
+    public Entity(float moveSpeed, Character ch, int id) {
+        this.ch = ch;
+        this.moveSpeed = moveSpeed;
+        this.id = id;
+    }
+
     public void update(){
         moveTowardsCharacter();
         hurtCooldown.handleUpdateAndUnFlagging();
